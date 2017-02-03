@@ -1,0 +1,8 @@
+*.pyc
+*.o
+*.hepmc
+*.root
+result/*
+setup.sh
+junk
+susyhit
