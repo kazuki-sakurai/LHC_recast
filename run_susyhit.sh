@@ -14,6 +14,7 @@ if [[ ! -e $slha_file ]]; then
 fi
 
 rm -f $susyhit_dir"/slhaspectrum.in"
+rm -f $susyhit_dir"/susyhit_slha.out"
 cp $slha_file $susyhit_dir"/slhaspectrum.in"
 cd $susyhit_dir
 ./run

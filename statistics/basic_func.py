@@ -4,9 +4,7 @@ import sys, os
 def get_eff(ana_target, SR_list, eff_file):
     eff = {}
     ana, mode, sr_current = '', '', ''
-    count = 0
     for line in open(eff_file):
-        count += 1
         elems = line.split() 
         if len(elems) == 0: continue
         if elems[0] == 'Analysis:': ana = elems[1]
