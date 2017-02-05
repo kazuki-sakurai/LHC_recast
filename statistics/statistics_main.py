@@ -31,5 +31,8 @@ for ana in ana_list:
         print 'Nobs:', SRdata[sr]['Nobs']
         print 'Nbkg:', SRdata[sr]['Nbkg']
         print 'Nbkg_err:', SRdata[sr]['Nbkg_err']        
+        print 'S95_obs:', SRdata[sr]['S95_obs']
+        print 'S95_exp:', SRdata[sr]['S95_exp']
+        print 'p0:', SRdata[sr]['p0']        
 
 
