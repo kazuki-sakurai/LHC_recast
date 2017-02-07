@@ -2,8 +2,30 @@
 
 import sys
 
-slha_file = sys.argv[1]
-nev = sys.argv[2]
+try:
+    slha_file = sys.argv[1]
+    mode = sys.argv[2]
+    energy = sys.argv[3]
+    nev = int(sys.argv[4])
+except:
+    print '[slha] [mode] [energy] [nev]'
+    exit()
+
+if mode in ['QqN1']:  mode = 'squark_only'
+if mode in ['GqqN1']: mode = 'gluino_only'
+
+
+if mode == 'all': process = 'SUSY:all = on'
+if mode == 'squark_only': 
+    process = '''SUSY:gg2squarkantisquark = on
+SUSY:qqbar2squarkantisquark = on'''
+if mode == 'gluino_only': 
+    process = '''SUSY:gg2gluinogluino  = on
+SUSY:qqbar2gluinogluino  = on'''
+
+if mode not in ['all', 'squark_only', 'gluino_only']:
+    print '[mode] has to be chosen from [all, squark_only, gluino_only]'
+    exit()
 
 print '''
 ! main24.cmnd
@@ -25,13 +47,14 @@ Next:numberShowEvent = 2           ! print event record n times
 ! 3) Beam parameter settings. Values below agree with default ones.
 Beams:idA = 2212                   ! first beam, p = 2212, pbar = -2212
 Beams:idB = 2212                   ! second beam, p = 2212, pbar = -2212
-Beams:eCM = 13000.                 ! CM energy of collision
+Beams:eCM = {energy}000.                 ! CM energy of collision
 
 ! 4) Read SLHA spectrum (a few examples are provided by default)
 SLHA:file = {slha_file}       ! Sample SLHA2 spectrum
 
 ! 5) Process selection
-SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
+{process}
+#SUSY:all = on                      ! Switches on ALL (~400) SUSY processes
 #SUSY:gg2gluinogluino  = on
 #SUSY:qqbar2gluinogluino  = on
 #SUSY:qg2squarkgluino = on
@@ -52,4 +75,5 @@ PartonLevel:MPI = off              ! no multiparton interactions
 PartonLevel:ISR = on              ! no initial-state radiation
 PartonLevel:FSR = off              ! no final-state radiation
 HadronLevel:Hadronize = on        ! no hadronization
-'''.format(slha_file=slha_file, nev=nev)
+'''.format(slha_file=slha_file, process=process, energy=energy, nev=nev)
+
