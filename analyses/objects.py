@@ -14,6 +14,8 @@ class Cut:
         self.SRname = SRname
         self.cut = OrderedDict()
         self.id = OrderedDict()
+        self.cut[SRname] = 0.
+        self.id[SRname] = 0
 
     def Pass(self, name, idd=-1):
         if name in self.cut.keys():
@@ -22,6 +24,9 @@ class Cut:
             if idd < 0: idd = len(self.cut.keys())
             self.id[name] = idd
             self.cut[name] = 1
+
+    def PassSR(self):
+        self.cut[self.SRname] += 1
 
     def PrintEff(self, Nev):
 

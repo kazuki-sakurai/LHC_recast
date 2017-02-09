@@ -101,7 +101,7 @@ class atlas_1605_03814:
                         self.SR['2jl'].Pass('MET/sqrt(HT) > 15')
                         if meff_inc > 1200.:
                             self.SR['2jl'].Pass('meff_inc > 1200')
-                            self.SR['2jl'].Pass('2jl')
+                            self.SR['2jl'].PassSR()
 
         #########################
         #  SR: 2jm
@@ -118,7 +118,7 @@ class atlas_1605_03814:
                             self.SR['2jm'].Pass('MET/sqrt(H_T) > 15') 
                             if meff_inc > 1600.:
                                 self.SR['2jm'].Pass('meff_inc > 1600') 
-                                self.SR['2jm'].Pass('2jm') 
+                                self.SR['2jm'].PassSR()
 
 
         #########################
@@ -134,7 +134,7 @@ class atlas_1605_03814:
                         self.SR['2jt'].Pass('MET/sqrt(H_T) > 20') 
                         if meff_inc > 2000.:
                             self.SR['2jt'].Pass('meff_inc > 2000') 
-                            self.SR['2jt'].Pass('2jt') 
+                            self.SR['2jt'].PassSR() 
 
         #########################
         #  SR: 4jt
@@ -153,7 +153,7 @@ class atlas_1605_03814:
                                 self.SR['4jt'].Pass('MET/meff_Nj > 0.2') 
                                 if meff_inc > 2200.:
                                     self.SR['4jt'].Pass('meff_inc > 2200') 
-                                    self.SR['4jt'].Pass('4jt') 
+                                    self.SR['4jt'].PassSR()
 
         #########################
         #  SR: 5j
@@ -174,7 +174,7 @@ class atlas_1605_03814:
                                     self.SR['5j'].Pass('MET/meff_Nj > 0.25') 
                                     if meff_inc > 1600.:
                                         self.SR['5j'].Pass('meff_inc > 1600') 
-                                        self.SR['5j'].Pass('5j') 
+                                        self.SR['5j'].PassSR()
 
         #########################
         #  SR: 6jm
@@ -195,7 +195,7 @@ class atlas_1605_03814:
                                     self.SR['6jm'].Pass('MET/meff_Nj > 0.25') 
                                     if meff_inc > 1600.:
                                         self.SR['6jm'].Pass('meff_inc > 1600') 
-                                        self.SR['6jm'].Pass('6jm') 
+                                        self.SR['6jm'].PassSR()
 
         #########################
         #  SR: 6jt
@@ -216,7 +216,7 @@ class atlas_1605_03814:
                                     self.SR['6jt'].Pass('MET/meff_Nj > 0.2') 
                                     if meff_inc > 2000.:
                                         self.SR['6jt'].Pass('meff_inc > 2000') 
-                                        self.SR['6jt'].Pass('6jt') 
+                                        self.SR['6jt'].PassSR()
 
 
     #########################################
