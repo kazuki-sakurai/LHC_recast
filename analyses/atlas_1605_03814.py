@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from objects import *
 from collections import OrderedDict
+from aplanarity import *
 
 class atlas_1605_03814:
 
@@ -86,7 +87,7 @@ class atlas_1605_03814:
             dPhi =  delta_phi(jets[i].p.Phi(), pTmiss.Phi())
             if dPhi < dPhiMin_all: dPhiMin_all = dPhi;        
 
-        aplanarity = 0
+        sph, aplanarity = Aplanarity(jets)
 
         #########################
         #  SR: 2jl
