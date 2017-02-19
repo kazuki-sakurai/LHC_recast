@@ -148,13 +148,15 @@ class atlas_1605_03814:
                     self.SR['4jt'].Pass('dPhiMin_all > 0.2') 
                     if jets[1].pT > 100.: 
                         self.SR['4jt'].Pass('pTj2 > 100') 
-                        if aplanarity > 0.04:                         
-                            self.SR['4jt'].Pass('Aplanarity > 0.04') 
-                            if MET/meff_Nj[3] > 0.2:
-                                self.SR['4jt'].Pass('MET/meff_Nj > 0.2') 
-                                if meff_inc > 2200.:
-                                    self.SR['4jt'].Pass('meff_inc > 2200') 
-                                    self.SR['4jt'].PassSR()
+                        if jets[3].pT > 100.: 
+                            self.SR['4jt'].Pass('pTj4 > 100') 
+                            if aplanarity > 0.04:                         
+                                self.SR['4jt'].Pass('Aplanarity > 0.04') 
+                                if MET/meff_Nj[3] > 0.2:
+                                    self.SR['4jt'].Pass('MET/meff_Nj > 0.2') 
+                                    if meff_inc > 2200.:
+                                        self.SR['4jt'].Pass('meff_inc > 2200') 
+                                        self.SR['4jt'].PassSR()
 
         #########################
         #  SR: 5j
