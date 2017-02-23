@@ -73,22 +73,28 @@ class atlas_1605_03814:
             meff_Nj.append(meff)
 
         H_T = 0
-        for i in xrange(Njet): H_T += jets[i].pT
-        meff_inc = H_T + MET 
+        meff_inc = MET
+        #meff_inc = 0.
+        for i in xrange(Njet):
+            H_T += jets[i].pT
+            meff_inc += jets[i].pT * (jets[i].pT > 50)
+        #meff_inc = H_T + MET 
 
         dPhiMin_123 = 1000;        
         for i in xrange(min(Njet, 3)):
+            if jets[i].pT < 50 : continue
             dPhi =  delta_phi(jets[i].p.Phi(), pTmiss.Phi())
             if dPhi < dPhiMin_123: dPhiMin_123 = dPhi;
 
 
         dPhiMin_all = 1000;
         for i in xrange(Njet):
+            if jets[i].pT < 50 : continue
             dPhi =  delta_phi(jets[i].p.Phi(), pTmiss.Phi())
             if dPhi < dPhiMin_all: dPhiMin_all = dPhi;        
 
-        sph, aplanarity = Aplanarity(jets)
-
+        if len(jets) >2: sph, aplanarity = Aplanarity(jets)
+        else: sph, aplanarity = 0, 0 
         #########################
         #  SR: 2jl
         #########################        
@@ -98,7 +104,7 @@ class atlas_1605_03814:
                 self.SR['2jl'].Pass('dPhiMin_123 > 0.8') 
                 if jets[1].pT > 200.:
                     self.SR['2jl'].Pass('pTj2 > 200')
-                    if MET/sqrt(H_T) > 8.:
+                    if MET/sqrt(H_T) > 15.:
                         self.SR['2jl'].Pass('MET/sqrt(HT) > 15')
                         if meff_inc > 1200.:
                             self.SR['2jl'].Pass('meff_inc > 1200')
@@ -149,14 +155,18 @@ class atlas_1605_03814:
                     if jets[1].pT > 100.: 
                         self.SR['4jt'].Pass('pTj2 > 100') 
                         if jets[3].pT > 100.: 
-                            self.SR['4jt'].Pass('pTj4 > 100') 
-                            if aplanarity > 0.04:                         
-                                self.SR['4jt'].Pass('Aplanarity > 0.04') 
-                                if MET/meff_Nj[3] > 0.2:
-                                    self.SR['4jt'].Pass('MET/meff_Nj > 0.2') 
-                                    if meff_inc > 2200.:
-                                        self.SR['4jt'].Pass('meff_inc > 2200') 
-                                        self.SR['4jt'].PassSR()
+                            self.SR['4jt'].Pass('pTj4 > 100')
+                            if jets[2].pT > 100.:
+                                self.SR['4jt'].Pass('pTj3 > 100')            
+                                if aplanarity > 0.04:                         
+                                    self.SR['4jt'].Pass('Aplanarity > 0.04') 
+                                    if MET/meff_Nj[3] > 0.2:
+                                        self.SR['4jt'].Pass('MET/meff_Nj > 0.2')
+                                        if meff_inc > 2200.:
+                                            self.SR['4jt'].Pass('meff_inc > 2200') 
+                                            self.SR['4jt'].PassSR()
+                                        
+                             
 
         #########################
         #  SR: 5j
@@ -168,16 +178,22 @@ class atlas_1605_03814:
                 if dPhiMin_all > 0.2: 
                     self.SR['5j'].Pass('dPhiMin_all > 0.2') 
                     if jets[1].pT > 100.: 
-                        self.SR['5j'].Pass('pTj2 > 100') 
-                        if jets[4].pT > 50.: 
-                            self.SR['5j'].Pass('pTj5 > 50') 
-                            if aplanarity > 0.04:                         
-                                self.SR['5j'].Pass('Aplanarity > 0.04') 
-                                if MET/meff_Nj[4] > 0.25:
-                                    self.SR['5j'].Pass('MET/meff_Nj > 0.25') 
-                                    if meff_inc > 1600.:
-                                        self.SR['5j'].Pass('meff_inc > 1600') 
-                                        self.SR['5j'].PassSR()
+                        self.SR['5j'].Pass('pTj2 > 100')
+                        if jets[2].pT > 100.:
+                            self.SR['5j'].Pass('pTj3 > 100')
+                            if jets[3].pT > 100.:
+                                self.SR['5j'].Pass('pTj4 >100')
+                                if jets[4].pT > 50.: 
+                                    self.SR['5j'].Pass('pTj5 > 50') 
+                                    if aplanarity > 0.04:                         
+                                        self.SR['5j'].Pass('Aplanarity > 0.04') 
+                                        if MET/meff_Nj[4] > 0.25:
+                                            self.SR['5j'].Pass('MET/meff_Nj > 0.25') 
+                                            if meff_inc > 1600.:
+                                                self.SR['5j'].Pass('meff_inc > 1600') 
+                                                self.SR['5j'].PassSR()
+                                        
+                                            
 
         #########################
         #  SR: 6jm
@@ -189,16 +205,23 @@ class atlas_1605_03814:
                 if dPhiMin_all > 0.2: 
                     self.SR['6jm'].Pass('dPhiMin_all > 0.2') 
                     if jets[1].pT > 100.: 
-                        self.SR['6jm'].Pass('pTj2 > 100') 
-                        if jets[5].pT > 50.: 
-                            self.SR['6jm'].Pass('pTj6 > 50') 
-                            if aplanarity > 0.04:                         
-                                self.SR['6jm'].Pass('Aplanarity > 0.04') 
-                                if MET/meff_Nj[5] > 0.25:
-                                    self.SR['6jm'].Pass('MET/meff_Nj > 0.25') 
-                                    if meff_inc > 1600.:
-                                        self.SR['6jm'].Pass('meff_inc > 1600') 
-                                        self.SR['6jm'].PassSR()
+                        self.SR['6jm'].Pass('pTj2 > 100')
+                        if jets[2].pT > 100.:
+                             self.SR['6jm'].Pass('pTj3 > 100')
+                             if jets[3].pT > 100.:
+                                 self.SR['6jm'].Pass('pTj4 > 100')
+                                 if jets[4].pT > 50.:
+                                     self.SR['6jm'].Pass('pTj5 > 50')
+                                     if jets[5].pT > 50.: 
+                                         self.SR['6jm'].Pass('pTj6 > 50') 
+                                         if aplanarity > 0.04:                         
+                                             self.SR['6jm'].Pass('Aplanarity > 0.04') 
+                                             if MET/meff_Nj[5] > 0.25:
+                                                 self.SR['6jm'].Pass('MET/meff_Nj > 0.25') 
+                                                 if meff_inc > 1600.:
+                                                     self.SR['6jm'].Pass('meff_inc > 1600') 
+                                                     self.SR['6jm'].PassSR()
+                                        
 
         #########################
         #  SR: 6jt
@@ -210,16 +233,23 @@ class atlas_1605_03814:
                 if dPhiMin_all > 0.2: 
                     self.SR['6jt'].Pass('dPhiMin_all > 0.2') 
                     if jets[1].pT > 100.: 
-                        self.SR['6jt'].Pass('pTj2 > 100') 
-                        if jets[5].pT > 50.: 
-                            self.SR['6jt'].Pass('pTj6 > 50') 
-                            if aplanarity > 0.04:                         
-                                self.SR['6jt'].Pass('Aplanarity > 0.04') 
-                                if MET/meff_Nj[5] > 0.2:
-                                    self.SR['6jt'].Pass('MET/meff_Nj > 0.2') 
-                                    if meff_inc > 2000.:
-                                        self.SR['6jt'].Pass('meff_inc > 2000') 
-                                        self.SR['6jt'].PassSR()
+                        self.SR['6jt'].Pass('pTj2 > 100')
+                        if jets[2].pT > 100.:
+                            self.SR['6jt'].Pass('pTj3 > 100')
+                            if jets[3].pT > 100.:
+                                self.SR['6jt'].Pass('pTj4 > 100')
+                                if jets[4].pT > 50.:
+                                    self.SR['6jt'].Pass('pTj5 > 50')
+                                    if jets[5].pT > 50.: 
+                                        self.SR['6jt'].Pass('pTj6 > 50') 
+                                        if aplanarity > 0.04:                         
+                                            self.SR['6jt'].Pass('Aplanarity > 0.04') 
+                                            if MET/meff_Nj[5] > 0.2:
+                                                self.SR['6jt'].Pass('MET/meff_Nj > 0.2') 
+                                                if meff_inc > 2000.:
+                                                    self.SR['6jt'].Pass('meff_inc > 2000') 
+                                                    self.SR['6jt'].PassSR()
+                                        
 
 
     #########################################
