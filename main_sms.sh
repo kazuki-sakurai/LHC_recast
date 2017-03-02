@@ -17,7 +17,7 @@ if [[ $mode == 'GqqN2lLlN1' ]]; then
     m4=$5        
     tag=$mode'_'$m1'_'$m2'_'$m3'_'$m4    
 fi
-if [ $mode == 'C1lLlN1_N2lLlN1' ] || [ $mode == 'C1lLlN1_C1lLlN1' ] || [ $mode == 'C1lL3lN1_N2lL3lN1' ] || [ $mode == 'C1lL3lN1_C1lL3lN1' ]; then
+if [ $mode == 'C1lLlN1_N2lLlN1' ] || [ $mode == 'C1lLlN1_C1lLlN1' ] || [ $mode == 'C1lL3lN1_N2lL3lN1' ] || [ $mode == 'GqqC1wN1' ]; then
     n_mass=3
     m1=$2
     m2=$3
