@@ -29,7 +29,9 @@ class atlas_1602_09058:
 
         leps = []
         for lep in objects['leps']:
-            if abs(lep.pid) == 11 and lep.pT > 10 and lep.abseta < 2.: leps.append(lep)
+            if abs(lep.pid) == 11 and lep.pT > 10 and lep.abseta < 2.:
+                if lep.abseta < 1.37 or lep.abseta > 1.52:
+                    leps.append(lep)
             if abs(lep.pid) == 13 and lep.pT > 10 and lep.abseta < 2.5: leps.append(lep)
 
         bjets = []
@@ -63,16 +65,16 @@ class atlas_1602_09058:
         Njet = len(jets)
         Nbjet = len(bjets)            
         Nlep = 0
-        
+        print "Here"
         meff = MET
         Njet50 = 0
         for i in xrange(Njet):
             meff = meff + jets[i].pT
             Njet50 = Njet50 + 1*(jets[i].pT > 50)
-        for i in xrange(Nlep):
+        for i in xrange(len(leps)):
             meff = meff + leps[i].pT
             Nlep = Nlep + 1*(leps[i].pT > 20)
-        
+      #  print "cousas", Nlep, Njet50
         
       
 
