@@ -26,7 +26,8 @@ if not os.path.exists(eff_file):
     exit()
 
 ana_list = []
-ana_list.append('atlas_1605_03814')
+#ana_list.append('atlas_1605_03814')
+ana_list.append('atlas_1602_09058')
 out = {}
 
 for ana in ana_list:

@@ -9,7 +9,10 @@ def get_eff(ana_target, SR_list, eff_file):
         if len(elems) == 0: continue
         if elems[0] == 'Analysis:': ana = elems[1]
         if ana == ana_target:
-            if len(elems) > 3 and elems[3] in SR_list: 
-                sr_current = elems[3]
-                eff[sr_current] = float(elems[5])               
+            if len(elems) > 3:
+                #print elems[3]
+                if elems[3] in SR_list:
+                    print elems[3]
+                    sr_current = elems[3]
+                    eff[sr_current] = float(elems[5])               
     return eff
