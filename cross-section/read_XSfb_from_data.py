@@ -54,7 +54,7 @@ if mode == 'Q3Q3':
     exit()
 
 if mode == 'QQ4F': 
-    QQ5F = get_xsfb(QQ5F_file, m_in)
+    QQ5F = get_xsfb(QQ5F_file, m_in, 'pb')
     BLBL = BRBR = get_xsfb(Q3Q3_file, m_in, 'pb')
     QQ4F = QQ5F - BLBL - BRBR
     print QQ4F
