@@ -12,7 +12,7 @@ except:
     exit()
 
 if mode in ['QqN1']:  mode = 'squark_only'
-if mode in ['GqqN1', 'GttN1', 'GqqN2lLlN1', 'GqqC1wN1']: mode = 'gluino_only'
+if mode in ['GqqN1', 'GttN1', 'GqqN2lLlN1', 'GqqC1wN1', 'GqqC1wN2zN1']: mode = 'gluino_only'
 if mode in ['C1lLlN1_C1lLlN1', 'C1lL3lN1_C1lL3lN1']: mode = 'C1C1'
 if mode in ['C1lLlN1_N2lLlN1', 'C1lL3lN1_N2lL3lN1']: mode = 'C1N2'
 

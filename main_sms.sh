@@ -2,6 +2,12 @@
 
 wdir=`pwd`
 
+
+if [[ $3 == '' ]]; then
+    echo '[mode] [m1] [m2] ...'
+    exit
+fi
+
 mode=$1 # [QqN1, GqqN1, GttN1, GqqN2lLlN1]
 if [ $mode == 'QqN1' ] || [ $mode == 'GqqN1' ] || [ $mode == 'GttN1' ]; then
     n_mass=2
@@ -9,7 +15,7 @@ if [ $mode == 'QqN1' ] || [ $mode == 'GqqN1' ] || [ $mode == 'GttN1' ]; then
     m2=$3
     tag=$mode'_'$m1'_'$m2
 fi
-if [[ $mode == 'GqqN2lLlN1' ]]; then
+if [ $mode == 'GqqN2lLlN1' ] || [ $mode == 'GqqC1wN2zN1' ]; then
     n_mass=4
     m1=$2
     m2=$3
@@ -17,7 +23,7 @@ if [[ $mode == 'GqqN2lLlN1' ]]; then
     m4=$5        
     tag=$mode'_'$m1'_'$m2'_'$m3'_'$m4    
 fi
-if [ $mode == 'C1lLlN1_N2lLlN1' ] || [ $mode == 'C1lLlN1_C1lLlN1' ] || [ $mode == 'C1lL3lN1_N2lL3lN1' ] || [ $mode == 'GqqC1wN1' ]; then
+if [ $mode == 'C1lLlN1_N2lLlN1' ] || [ $mode == 'C1lLlN1_C1lLlN1' ] || [ $mode == 'C1lL3lN1_N2lL3lN1' ] || [ $mode == 'GqqC1wN1' ] || [ $mode == 'BtC1wN1' ]; then
     n_mass=3
     m1=$2
     m2=$3

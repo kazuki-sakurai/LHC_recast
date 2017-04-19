@@ -26,7 +26,7 @@ fi
 
 python $input_writer  $input_path  $mode  $energy  $nev  >  $pythia_setting
 
-$pythia  $pythia_setting  $hepmc_output | tee  $pythia_writeout
+$pythia $pythia_setting $hepmc_output | tee  $pythia_writeout
 ls -ltr $hepmc_output
 
 echo "#--- End of run_pythia.sh ---#"
