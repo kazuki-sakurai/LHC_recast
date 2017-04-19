@@ -15,7 +15,7 @@ if mode in ['QqN1']:  mode = 'squark_only'
 if mode in ['GqqN1', 'GttN1', 'GqqN2lLlN1', 'GqqC1wN1', 'GqqC1wN2zN1']: mode = 'gluino_only'
 if mode in ['C1lLlN1_C1lLlN1', 'C1lL3lN1_C1lL3lN1']: mode = 'C1C1'
 if mode in ['C1lLlN1_N2lLlN1', 'C1lL3lN1_N2lL3lN1']: mode = 'C1N2'
-
+if mode in ['B1tC1wN1']: mode = 'sbottom_only'
 
 if mode == 'all': process = 'SUSY:all = on'
 if mode == 'squark_only': 
@@ -26,9 +26,16 @@ if mode == 'gluino_only':
 SUSY:qqbar2gluinogluino  = on'''
 if mode == 'C1C1': process = 'SUSY:qqbar2chi+chi-  = on'
 if mode == 'C1N2': process = 'SUSY:qqbar2chi+-chi0 = on'
+if mode == 'sbottom_only':     process = '''SUSY:gg2squarkantisquark = on
+SUSY:qqbar2squarkantisquark = on
+SUSY:idA        = 1000005           ! 0: all
+SUSY:idB        = -1000005           ! 0: all'''
 
-if mode not in ['all', 'squark_only', 'gluino_only', 'C1C1', 'C1N2']:
-    print '[mode] has to be chosen from [all, squark_only, gluino_only, C1C1, C1N2]'
+
+
+
+if mode not in ['all', 'squark_only', 'gluino_only', 'C1C1', 'C1N2', 'sbottom_only']:
+    print '[mode] has to be chosen from [all, squark_only, gluino_only, C1C1, C1N2, sbottom_only]'
     exit()
 
 print '''

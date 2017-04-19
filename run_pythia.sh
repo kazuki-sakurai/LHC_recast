@@ -24,7 +24,7 @@ if [[ -e $hepmc_output ]]; then
     rm -f $hepmc_output
 fi
 
-python $input_writer  $input_path  $mode  $energy  $nev  >  $pythia_setting
+python $input_writer  $input_path  $mode  $energy  $nev  >  $pythia_setting 
 
 $pythia $pythia_setting $hepmc_output | tee  $pythia_writeout
 ls -ltr $hepmc_output
