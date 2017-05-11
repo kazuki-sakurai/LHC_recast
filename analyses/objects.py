@@ -100,7 +100,7 @@ def delta_phi(phi_1, phi_2):
 #     return acute(phi_1, phi_2)
 
 
-def get_base_objects(event):
+def get_base_objects(event, add_taus = 0):
 
     objects = {}
 
@@ -140,7 +140,16 @@ def get_base_objects(event):
         Data.pT = obj['PT']
         Data.abseta = abs(obj['eta'])
         leps.append( Data )
-
+    if add_taus:
+        for obj in event['tau']:
+            Data = Structure()
+            sign = - obj.charge()
+            Data.pid = sign * 15
+            Data.p = TLorentzVector()
+            Data.p.SetPtEtaPhiM(obj['PT'], obj['eta'], obj['phi'], obj['jmass'])
+            Data.pT = obj['PT']
+            Data.abseta = abs(obj['eta'])
+            leps.append( Data )
     #MET
     pTmiss = TLorentzVector()
     obj = event['MET'][0]

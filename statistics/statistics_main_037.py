@@ -30,10 +30,10 @@ ana_list = []
 #ana_list.append('atlas_1605_03814')
 #ana_list.append('atlas_1602_09058')
 #ana_list.append('atlas_1605_04285')
-ana_list.append('atlas_conf_2016_093')
+#ana_list.append('atlas_conf_2016_093')
 #ana_list.append('atlas_conf_2016_096')
 #ana_list.append('atlas_conf_2016_054')
-#ana_list.append('atlas_conf_2016_037')
+ana_list.append('atlas_conf_2016_037')
 out = {}
 
 for ana in ana_list:

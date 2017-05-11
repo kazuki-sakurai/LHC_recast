@@ -34,7 +34,7 @@ def MT2bl_wrapper(lepE, lepPx, lepPy, lepPz,
 
     lib_MT2bl = inline(code,args,
                     headers=['"MT2bl.h"'],                    
-                    include_dirs=["Users/kazuki/Projects/lhc_recast/analyses/mT2_packages"],
+                    include_dirs=["/scratch18/kazuki2/analyses/mT2_packages"],
                     verbose=0                    
                     )
 
@@ -86,7 +86,7 @@ def MT2_wrapper(m1, p1x, p1y, m2, p2x, p2y, MET_m, MET_x, MET_y):
 
     lib_MT2 = inline(code,args,
                     headers=['"mt2_bisect.h"','"mt2_bisect_main.h"'],
-                    include_dirs=["/Users/kazuki/Projects/lhco_analysis/mT2_packages"],
+                    include_dirs=["/scratch18/kazuki2/analyses/mT2_packages"],
                     verbose=0
                     )
 

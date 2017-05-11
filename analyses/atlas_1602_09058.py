@@ -29,10 +29,10 @@ class atlas_1602_09058:
 
         leps = []
         for lep in objects['leps']:
-            if abs(lep.pid) == 11 and lep.pT > 10 and lep.abseta < 2.:
+            if abs(lep.pid) == 11 and lep.pT > 10 and lep.abseta < 2.:       #electrons
                 if lep.abseta < 1.37 or lep.abseta > 1.52:
                     leps.append(lep)
-            if abs(lep.pid) == 13 and lep.pT > 10 and lep.abseta < 2.5: leps.append(lep)
+            if abs(lep.pid) == 13 and lep.pT > 10 and lep.abseta < 2.5: leps.append(lep)     #muons
 
         bjets = []
         for b in objects['bjets']:
@@ -65,16 +65,16 @@ class atlas_1602_09058:
         Njet = len(jets)
         Nbjet = len(bjets)            
         Nlep = 0
-        print "Here"
+        
         meff = MET
         Njet50 = 0
         for i in xrange(Njet):
             meff = meff + jets[i].pT
             Njet50 = Njet50 + 1*(jets[i].pT > 50)
         for i in xrange(len(leps)):
-            meff = meff + leps[i].pT
+            meff = meff + leps[i].pT*(leps[i].pT > 20)
             Nlep = Nlep + 1*(leps[i].pT > 20)
-      #  print "cousas", Nlep, Njet50
+     
         
       
 
@@ -93,6 +93,7 @@ class atlas_1602_09058:
                         self.SR['0b3j'].Pass('MET > 200')
                         if meff > 550.:
                             self.SR['0b3j'].Pass('meff > 550')
+                            self.SR['0b3j'].PassSR()
 
         #########################
         #  SR: 0b5j
@@ -108,6 +109,7 @@ class atlas_1602_09058:
                         self.SR['0b5j'].Pass('MET > 125')
                         if meff > 650.:
                             self.SR['0b5j'].Pass('meff > 650')
+                            self.SR['0b5j'].PassSR()
 
 
         #########################
@@ -124,6 +126,7 @@ class atlas_1602_09058:
                        self.SR['1b'].Pass('MET > 150')
                        if meff > 550.:
                            self.SR['1b'].Pass('meff > 550')
+                           self.SR['1b'].PassSR()
 
         #########################
         #  SR: 3b
@@ -137,6 +140,7 @@ class atlas_1602_09058:
                     self.SR['3b'].Pass('MET > 125')
                     if meff > 650.:
                             self.SR['3b'].Pass('meff > 650')
+                            self.SR['3b'].PassSR()
                                         
                              
 

@@ -7,10 +7,10 @@ from objects import *
 #from atlas_1605_03814 import * 
 #from atlas_1602_09058 import *
 #from atlas_1605_04285 import *
-from atlas_conf_2016_093 import *
+#from atlas_conf_2016_093 import *
 #from atlas_conf_2016_096 import *
 #from atlas_conf_2016_054 import *
-#from atlas_conf_2016_037 import *
+from atlas_conf_2016_037 import *
 
 a = Structure()
 
@@ -20,10 +20,10 @@ inFiles.pop(0)
 #atlas_1605_03814 = atlas_1605_03814()
 #atlas_1602_09058 = atlas_1602_09058()
 #atlas_1605_04285 = atlas_1605_04285()
-atlas_conf_2016_093 = atlas_conf_2016_093()
+#atlas_conf_2016_093 = atlas_conf_2016_093()
 #atlas_conf_2016_096 = atlas_conf_2016_096()
 #atlas_conf_2016_054 = atlas_conf_2016_054()
-#atlas_conf_2016_037 = atlas_conf_2016_037()
+atlas_conf_2016_037 = atlas_conf_2016_037()
 
 
 #########################################
@@ -48,10 +48,10 @@ for inFile in inFiles:
         #atlas_1605_03814.event_analysis(base_objects)
         #atlas_1602_09058.event_analysis(base_objects)
         #atlas_1605_04285.event_analysis(base_objects)
-        atlas_conf_2016_093.event_analysis(base_objects_wtaus)
+        #atlas_conf_2016_093.event_analysis(base_objects_wtaus)
         #atlas_conf_2016_096.event_analysis(base_objects)
         #atlas_conf_2016_054.event_analysis(base_objects)
-        #atlas_conf_2016_037.event_analysis(base_objects)
+        atlas_conf_2016_037.event_analysis(base_objects)
     
 #########################################
 #    Output
@@ -59,7 +59,7 @@ for inFile in inFiles:
 #atlas_1605_03814.write_result(iev)
 #atlas_1602_09058.write_result(iev)
 #atlas_1605_04285.write_result(iev)
-atlas_conf_2016_093.write_result(iev)
+#atlas_conf_2016_093.write_result(iev)
 #atlas_conf_2016_096.write_result(iev)
 #atlas_conf_2016_054.write_result(iev)
-#atlas_conf_2016_037.write_result(iev)
+atlas_conf_2016_037.write_result(iev)
