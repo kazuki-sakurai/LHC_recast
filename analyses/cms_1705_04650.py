@@ -82,7 +82,7 @@ class cms_1705_04650:
                 electrons.append(lep)
             if abs(lep.pid) == 13 and lep.pT > 5 and lep.abseta < 2.4: ## muon
                 leps.append(lep)
-                muons.append(muon)
+                muons.append(lep)
 
         bjets = []
         for b in objects['bjets']:
@@ -111,7 +111,7 @@ class cms_1705_04650:
         for lep in leps:
             dPhi,pTl = delta_phi(lep.p.Phi(), pTmiss.Phi()), lep.pT
             mT = np.sqrt(2*pTl*MET*(1 - np.cos(dPhi)))
-            isolapted_leptons += (pTl > 10) or (mT < 100) ## pT > 5 already imposed when selecing the particles 
+            isolated_leptons += (pTl > 10) or (mT < 100) ## pT > 5 already imposed when selecing the particles 
 
         if Njet > 1: ## at least two jets 
             _M,_i,_j = 0.,0,0 ## default value
@@ -298,7 +298,7 @@ class cms_1705_04650:
                                 self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
                                 if Nbjet == i: 
                                     self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(a == 4)):
+                                    if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
                                         self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
                                         self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
                         ## need separate loop for 7j,0b
@@ -391,7 +391,7 @@ class cms_1705_04650:
                         if Nbjet >= 3: 
                             for a in range(1,4): ## mT2 divisions
                                 self.SR['hHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
-                                if mT2 > intervals[a][0] and mT2 < (hintervals[a][1] + 1e9*(a == 3)):
+                                if mT2 > hintervals[a][0] and mT2 < (hintervals[a][1] + 1e9*(a == 3)):
                                     self.SR['hHT_7j3b_bin'+str(a)].Pass("mT2 inside bin"+str(a))
                                     self.SR['hHT_7j3b_bin'+str(a)].PassSR()   
 
@@ -457,7 +457,7 @@ class cms_1705_04650:
                         for j in range(1,3): ## mT2 divisions 
                             self.SR['eHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
                             if Nbjet >= 3: 
-                                self.SR['eHT_2j3b_bin'+str(a)].Pass('more than 3 bjets')
+                                self.SR['eHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
                                 if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
                                     self.SR['eHT_2j3b_bin'+str(j)].Pass("mT2 inside bin"+str(j))
                                     self.SR['eHT_2j3b_bin'+str(j)].PassSR()   
