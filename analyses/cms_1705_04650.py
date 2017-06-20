@@ -12,6 +12,7 @@ class cms_1705_04650:
         self.ananame = 'cms_1705_04650'
         self.SR = OrderedDict()        
         self.SR['base'] = Cut('base')
+        self.SR['AT4'] = Cut('AT4') ## meant to check Additional Table 4
         ## Mono jet SR (bins of pT):
         for i in range(1,8): self.SR['1j0b_bin'+str(i)] = Cut('1j0b_bin'+str(i))
         for i in range(1,6): self.SR['1j1b_bin'+str(i)] = Cut('1j1b_bin'+str(i))
@@ -138,7 +139,25 @@ class cms_1705_04650:
             HTmiss = -jets[0].p
             for jet in jets[1:]: HTmiss -= jet.p
 
-            diff_pTmiss_HTmiss = (pTmiss - HTmiss).P() / pTmiss.P() ## tbc
+            diff_pTmiss_HTmiss = (pTmiss - HTmiss).Pt() / pTmiss.Pt() ## tbc
+
+        if Njet >= 1:
+            self.SR['AT4'].Pass('at least 1 jet')
+            if (mT2 > 200)*(Njet >= 2):
+                self.SR['AT4'].Pass('MT2 > 200 GeV (if Nj >= 2)')
+                if dPhiMin > 0.3:
+                    self.SR['AT4'].Pass('dPhimin > 0.3')
+                    if diff_pTmiss_HTmiss < 0.5:
+                        self.SR['AT4'].Pass('abs(pTmiss - HTmiss)/pTmiss < 0.5')
+                        if Nlep == 0:
+                            self.SR['AT4'].Pass('Lepton veto')
+                            if HT > 1000:
+                                self.SR['AT4'].Pass('HT > 1000 GeV')
+                                if Njet >= 7:
+                                    self.SR['AT4'].Pass('Nj >= 7')
+                                    if Nbjet >= 2:
+                                        self.SR['AT4'].Pass('Nb >= 2')
+                                        self.SR['AT4'].PassSR()
 
         if Njet >= 1:
             self.SR['base'].Pass('at least 1 jet')
