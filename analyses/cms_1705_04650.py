@@ -2,6 +2,7 @@
 from objects import *
 from collections import OrderedDict
 from aplanarity import *
+import ctypes
 
 class cms_1705_04650:
 
@@ -9,6 +10,12 @@ class cms_1705_04650:
     #    Define groups of signal regions
     #########################################
     def __init__(self):
+
+        lib = ctypes.CDLL('cms_mt2/mt2.so')
+        cms_mt2 = lib.getMT2
+        cms_mt2.restype = ctypes.c_float
+        self.cms_mt2 = cms_mt2 
+
         self.ananame = 'cms_1705_04650'
         self.SR = OrderedDict()        
         self.SR['base'] = Cut('base')
@@ -114,15 +121,32 @@ class cms_1705_04650:
             mT = np.sqrt(2*pTl*MET*(1 - np.cos(dPhi)))
             isolated_leptons += (pTl > 10) or (mT < 100) ## pT > 5 already imposed when selecing the particles 
 
+        # if Njet > 1: ## at least two jets 
+        #     _M,_i,_j = 0.,0,0 ## default value
+        #     for i in xrange(Njet): ## loop over the inv mass
+        #         for j in xrange(Njet):
+        #             if(i!=j):
+        #                 M = (jets[i].p+jets[j].p).M() 
+        #                 if M < _M : _M,_i,_j = M,i,j
+        #     jet1,jet2 = jets[_i],jets[_j]
+        #     mT2 = MT2(jet1.p.M(),jet1.p.Px(),jet1.p.Py(),jet2.p.M(),jet2.p.Px(),jet2.p.Py(),pTmiss.M(),pTmiss.Px(),pTmiss.Py())
+        # else : mT2 = 0.0 ## so that it doesnt pass any of the cuts
+
+        px_ar, py_ar, pz_ar, E_ar = [], [], [], []
         if Njet > 1: ## at least two jets 
-            _M,_i,_j = 0.,0,0 ## default value
-            for i in xrange(Njet): ## loop over the inv mass
-                for j in xrange(Njet):
-                    if(i!=j):
-                        M = (jets[i].p+jets[j].p).M() 
-                        if M < _M : _M,_i,_j = M,i,j
-            jet1,jet2 = jets[_i],jets[_j]
-            mT2 = MT2(jet1.p.M(),jet1.p.Px(),jet1.p.Py(),jet2.p.M(),jet2.p.Px(),jet2.p.Py(),pTmiss.M(),pTmiss.Px(),pTmiss.Py())
+            for i in xrange(Njet):
+                px_ar.append(jets[i].p.Px())
+                py_ar.append(jets[i].p.Py())
+                pz_ar.append(jets[i].p.Pz())
+                E_ar.append(jets[i].p.E())
+            px_car = (ctypes.c_double * len(px_ar))(*px_ar)
+            py_car = (ctypes.c_double * len(py_ar))(*py_ar)
+            pz_car = (ctypes.c_double * len(pz_ar))(*pz_ar)
+            E_car = (ctypes.c_double * len(E_ar))(*E_ar)
+            njet_cint = ctypes.c_int(len(E_ar))
+            METx = ctypes.c_double(pTmiss.Px())
+            METy = ctypes.c_double(pTmiss.Py())
+            mT2 = self.cms_mt2(njet_cint, px_car, py_car, pz_car, E_car, METx, METy)
         else : mT2 = 0.0 ## so that it doesnt pass any of the cuts
 
         HT = sum(map(lambda x:x.pT,jets))

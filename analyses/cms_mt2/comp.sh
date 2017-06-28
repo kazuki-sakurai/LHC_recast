@@ -1,0 +1,1 @@
+g++ -fPIC -shared $(root-config --libs) -I$(root-config --incdir) -std=c++11 cms_mt2_example.C -o mt2.so
