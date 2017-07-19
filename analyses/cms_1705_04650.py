@@ -2,7 +2,6 @@
 from objects import *
 from collections import OrderedDict
 from aplanarity import *
-import ctypes
 
 class cms_1705_04650:
 
@@ -10,12 +9,6 @@ class cms_1705_04650:
     #    Define groups of signal regions
     #########################################
     def __init__(self):
-
-        lib = ctypes.CDLL('cms_mt2/mt2.so')
-        cms_mt2 = lib.getMT2
-        cms_mt2.restype = ctypes.c_float
-        self.cms_mt2 = cms_mt2 
-
         self.ananame = 'cms_1705_04650'
         self.SR = OrderedDict()        
         self.SR['base'] = Cut('base')
@@ -70,7 +63,6 @@ class cms_1705_04650:
         for i in range(1,2): ## 1 bin of MT2, extreme HT
             self.SR['eHT_2j2b_bin'+str(i)] = Cut('eHT_2j2b_bin'+str(i))
             self.SR['eHT_7j3b_bin'+str(i)] = Cut('eHT_2j3b_bin'+str(i))
-                                                
 
     #########################################
     #    Define jets, leptons, bjets, etc..
@@ -121,32 +113,15 @@ class cms_1705_04650:
             mT = np.sqrt(2*pTl*MET*(1 - np.cos(dPhi)))
             isolated_leptons += (pTl > 10) or (mT < 100) ## pT > 5 already imposed when selecing the particles 
 
-        # if Njet > 1: ## at least two jets 
-        #     _M,_i,_j = 0.,0,0 ## default value
-        #     for i in xrange(Njet): ## loop over the inv mass
-        #         for j in xrange(Njet):
-        #             if(i!=j):
-        #                 M = (jets[i].p+jets[j].p).M() 
-        #                 if M < _M : _M,_i,_j = M,i,j
-        #     jet1,jet2 = jets[_i],jets[_j]
-        #     mT2 = MT2(jet1.p.M(),jet1.p.Px(),jet1.p.Py(),jet2.p.M(),jet2.p.Px(),jet2.p.Py(),pTmiss.M(),pTmiss.Px(),pTmiss.Py())
-        # else : mT2 = 0.0 ## so that it doesnt pass any of the cuts
-
-        px_ar, py_ar, pz_ar, E_ar = [], [], [], []
         if Njet > 1: ## at least two jets 
-            for i in xrange(Njet):
-                px_ar.append(jets[i].p.Px())
-                py_ar.append(jets[i].p.Py())
-                pz_ar.append(jets[i].p.Pz())
-                E_ar.append(jets[i].p.E())
-            px_car = (ctypes.c_double * len(px_ar))(*px_ar)
-            py_car = (ctypes.c_double * len(py_ar))(*py_ar)
-            pz_car = (ctypes.c_double * len(pz_ar))(*pz_ar)
-            E_car = (ctypes.c_double * len(E_ar))(*E_ar)
-            njet_cint = ctypes.c_int(len(E_ar))
-            METx = ctypes.c_double(pTmiss.Px())
-            METy = ctypes.c_double(pTmiss.Py())
-            mT2 = self.cms_mt2(njet_cint, px_car, py_car, pz_car, E_car, METx, METy)
+            _M,_i,_j = 0.,0,0 ## default value
+            for i in xrange(Njet): ## loop over the inv mass
+                for j in xrange(Njet):
+                    if(i!=j):
+                        M = (jets[i].p+jets[j].p).M() 
+                        if M < _M : _M,_i,_j = M,i,j
+            jet1,jet2 = jets[_i],jets[_j]
+            mT2 = MT2(jet1.p.M(),jet1.p.Px(),jet1.p.Py(),jet2.p.M(),jet2.p.Px(),jet2.p.Py(),pTmiss.M(),pTmiss.Px(),pTmiss.Py())
         else : mT2 = 0.0 ## so that it doesnt pass any of the cuts
 
         HT = sum(map(lambda x:x.pT,jets))
@@ -229,208 +204,215 @@ class cms_1705_04650:
         #########################       
 
         ## QUESTION : [], <= and >=?
+
+        ## Get the keys:
+        allkeys,vlkeys,lkeys,mkeys,hkeys,ekeys = [],[],[],[],[],[]
+        for key in self.SR.keys():
+            if 'HT' in key: allkeys.append(key)
+            if 'vlHT' in key: vlkeys.append(key)
+            if 'lHT' in key and 'vlHT' not in key:  lkeys.append(key)
+            if 'mHT' in key: mkeys.append(key)
+            if 'hHT' in key: hkeys.append(key)
+            if 'eHT' in key: ekeys.append(key)
                          
         if Njet > 1:
-            for key in self.SR.keys(): 
-                if 'HT' in key: self.SR[key].Pass('Njet > 1')
-                ## Very low HT:
-                if HT > 250 and HT < 450:
-                    vlintervals = {1:[200,300],2:[300,400],3:[400,1e9]} ## mT2
-                    for key in self.SR.keys(): 
-                        if 'vlHT' in key: self.SR[key].Pass('Very low HT (HT > 250 GeV and HT < 450 GeV)')
-                    if Njet >= 2 and Njet < 4 : ### 2 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,4): ## mT2 divisions 
-                                self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
-                                if Nbjet == i:
-                                    self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > vlintervals[j][0] and mT2 < (vlintervals[j][1] + 1e9*(j == 3)):
-                                        self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].PassSR()   
-                    if Njet >= 4 : ### 4 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,4): ## mT2 divisions 
-                                self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass('more than 4 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > vlintervals[j][0] and mT2 < (vlintervals[j][1] + 1e9*(j == 3)):
-                                        self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].PassSR()   
-                    if Njet >= 2 : ### 2 jets area
-                        for j in range(1,4): ## mT2 divisions
-                            self.SR['vlHT_2j3b_bin'+str(j)].Pass('more than 2 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['vlHT_2j3b_bin'+str(a)].Pass('more than 3 bjets')
+            for key in allkeys: self.SR[key].Pass('Njet > 1') 
+            ## Very low HT:
+            if HT > 250 and HT < 450:
+                vlintervals = {1:[200,300],2:[300,400],3:[400,1e9]} ## mT2
+                for key in vlkeys: self.SR[key].Pass('Very low HT (HT > 250 GeV and HT < 450 GeV)')
+                if Njet >= 2 and Njet < 4 : ### 2 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,4): ## mT2 divisions 
+                            self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
+                            if Nbjet == i:
+                                self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
                                 if mT2 > vlintervals[j][0] and mT2 < (vlintervals[j][1] + 1e9*(j == 3)):
-                                    self.SR['vlHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['vlHT_2j3b_bin'+str(j)].PassSR()                                   
-                ## Low HT:
-                if HT > 450 and HT < 575:
-                    lintervals = {1:[200,300],2:[300,400],3:[400,500],4:[500,1e9]} ## mT2
-                    for key in self.SR.keys(): 
-                        if 'lHT' in key and 'vlHT' not in key: self.SR[key].Pass('Low HT (HT > 450 GeV and HT < 575 GeV)')
-                    if Njet >= 2 and Njet < 4 : ### 2 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,5): ## mT2 divisions
-                                self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['lHT_2j'+str(i)+'b_bin'+str(a)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
-                                        self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].PassSR()   
-                    if Njet >= 4 and Njet < 7 : ### 4 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,5): ## mT2 divisions
-                                self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
-                                        self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].PassSR() 
-                    if Njet >= 7 : ### 7 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,4): ## mT2 divisions
-                                self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 3)):
-                                        self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].PassSR() 
-                    if Njet >= 2 and Njet < 7 : ### 2 jets area II  ## REVISAR
-                        for j in range(1,5): ## mT2 divisions 
-                            self.SR['lHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['lHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
-                                if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
-                                    self.SR['lHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['lHT_2j3b_bin'+str(j)].PassSR()   
-                    if Njet >= 7 : ### 7 jets area
-                        for j in range(1,4): ## mT2 divisions
-                            self.SR['lHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['lHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
-                                if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 3)):
-                                    self.SR['lHT_7j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['lHT_7j3b_bin'+str(j)].PassSR()   
-                ## Medium HT:
-                if HT > 575 and HT < 1000:
-                    mintervals = {1:[200,300],2:[300,400],3:[400,600],4:[600,800],5:[800,1e9]} ## mT2
-                    for key in self.SR.keys(): 
-                        if 'mHT' in key: self.SR[key].Pass('Medium HT (HT > 575 GeV and HT < 1000 GeV)')
-                    if Njet >= 2 and Njet < 4 : ### 2 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,6): ## mT2 divisions 
-                                self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 5)):
-                                        self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].PassSR()  
-                    if Njet >= 4 and Njet < 7 : ### 4 jets area
-                        for i in range(3): ## Nb bins
-                            for j in range(1,6): ## mT2 divisions 
-                                self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 5)):
-                                        self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].PassSR()    
-                    if Njet >= 7 : ### 7 jets area
-                        for i in range(2): ## Nb bins
-                            for j in range(1,5): ## mT2 divisions 
-                                self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
-                                if Nbjet == i: 
-                                    self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
-                                        self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
-                        ## need separate loop for 7j,0b
-                        self.SR['mHT_7j0b_bin'+str(j)].Pass('more than 7 jets')
-                        if Nbjet == 0:
-                            self.SR['mHT_7j0b_bin'+str(j)].Pass('0 bjets')
-                            for a in range(1,6): ## mT2 divisions
-                                if mT2 > mintervals[a][0] and mT2 < (mintervals[a][1] + 1e9*(a == 3)):
-                                    self.SR['mHT_7j0b_bin'+str(a)].Pass("mT2 inside bin "+str(a))
-                                    self.SR['mHT_7j0b_bin'+str(a)].PassSR()
-                    if Njet >= 2 and Njet < 7 : ### 2 jets area II
-                        for j in range(1,5): ## mT2 divisions 
-                            self.SR['mHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['mHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
-                                if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
-                                    self.SR['mHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['mHT_2j3b_bin'+str(j)].PassSR()   
-                    if Njet >= 7 : ### 7 jets area II
+                                    self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['vlHT_2j'+str(i)+'b_bin'+str(j)].PassSR()   
+                if Njet >= 4 : ### 4 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,4): ## mT2 divisions 
+                            self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass('more than 4 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > vlintervals[j][0] and mT2 < (vlintervals[j][1] + 1e9*(j == 3)):
+                                    self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['vlHT_4j'+str(i)+'b_bin'+str(j)].PassSR()   
+                if Njet >= 2 : ### 2 jets area
+                    for j in range(1,4): ## mT2 divisions
+                        self.SR['vlHT_2j3b_bin'+str(j)].Pass('more than 2 jets') ## mT2 bins
+                        if Nbjet >= 3: 
+                            self.SR['vlHT_2j3b_bin'+str(a)].Pass('more than 3 bjets')
+                            if mT2 > vlintervals[j][0] and mT2 < (vlintervals[j][1] + 1e9*(j == 3)):
+                                self.SR['vlHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['vlHT_2j3b_bin'+str(j)].PassSR()                                   
+            ## Low HT:
+            if HT > 450 and HT < 575:
+                lintervals = {1:[200,300],2:[300,400],3:[400,500],4:[500,1e9]} ## mT2
+                for key in lkeys: self.SR[key].Pass('Low HT (HT > 450 GeV and HT < 575 GeV)')
+                if Njet >= 2 and Njet < 4 : ### 2 jets area
+                    for i in range(3): ## Nb bins
                         for j in range(1,5): ## mT2 divisions
-                            self.SR['mHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['mHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['lHT_2j'+str(i)+'b_bin'+str(a)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
+                                    self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['lHT_2j'+str(i)+'b_bin'+str(j)].PassSR()   
+                if Njet >= 4 and Njet < 7 : ### 4 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,5): ## mT2 divisions
+                            self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
+                                    self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['lHT_4j'+str(i)+'b_bin'+str(j)].PassSR() 
+                if Njet >= 7 : ### 7 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,4): ## mT2 divisions
+                            self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 3)):
+                                    self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['lHT_7j'+str(i)+'b_bin'+str(j)].PassSR() 
+                if Njet >= 2 and Njet < 7 : ### 2 jets area II  ## CHECK
+                    for j in range(1,5): ## mT2 divisions 
+                        self.SR['lHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
+                        if Nbjet >= 3: 
+                            self.SR['lHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 4)):
+                                self.SR['lHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['lHT_2j3b_bin'+str(j)].PassSR()   
+                if Njet >= 7 : ### 7 jets area
+                    for j in range(1,4): ## mT2 divisions
+                        self.SR['lHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
+                        if Nbjet >= 3: 
+                            self.SR['lHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            if mT2 > lintervals[j][0] and mT2 < (lintervals[j][1] + 1e9*(j == 3)):
+                                self.SR['lHT_7j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['lHT_7j3b_bin'+str(j)].PassSR()   
+            ## Medium HT:
+            if HT > 575 and HT < 1000:
+                mintervals = {1:[200,300],2:[300,400],3:[400,600],4:[600,800],5:[800,1e9]} ## mT2
+                for key in mkeys: self.SR[key].Pass('Medium HT (HT > 575 GeV and HT < 1000 GeV)')
+                if Njet >= 2 and Njet < 4 : ### 2 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,6): ## mT2 divisions 
+                            self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 5)):
+                                    self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['mHT_2j'+str(i)+'b_bin'+str(j)].PassSR()  
+                if Njet >= 4 and Njet < 7 : ### 4 jets area
+                    for i in range(3): ## Nb bins
+                        for j in range(1,6): ## mT2 divisions 
+                            self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 5)):
+                                    self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['mHT_4j'+str(i)+'b_bin'+str(j)].PassSR()    
+                if Njet >= 7 : ### 7 jets area
+                    for i in range(2): ## Nb bins
+                        for j in range(1,5): ## mT2 divisions 
+                            self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
+                            if Nbjet == i: 
+                                self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
                                 if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
-                                    self.SR['mHT_7j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['mHT_7j3b_bin'+str(j)].PassSR()   
-                ## High HT:
-                if HT > 1000 and HT < 1500:
-                    hintervals = {1:[200,400],2:[400,600],3:[600,800],4:[800,1000],5:[1000,1200],6:[1200,1e9]} ## mT2
-                    for key in self.SR.keys(): 
-                        if 'hHT' in key: self.SR[key].Pass('High HT (HT > 1000 GeV and HT < 1500 GeV)')
-                    if Njet >= 2 and Njet < 4 : ### 2 jets area
-                        for i in range(2):
-                            for j in range(1,7): 
-                                self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
-                                if Nbjet == i: 
-                                    self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 6)):
-                                        self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].PassSR()
-                        for j in range(1,6): 
-                            self.SR['hHT_2j2b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
-                            if Nbjet == 2: 
-                                self.SR['hHT_2j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
-                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
-                                    self.SR['hHT_2j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['hHT_2j2b_bin'+str(j)].PassSR()
-                    if Njet >= 4 and Njet < 7 : ### 4 jets area
-                        for i in range(2):
-                            for j in range(1,7): 
-                                self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
-                                if Nbjet == i: 
-                                    self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 6)):
-                                        self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].PassSR()
-                        for j in range(1,6): 
-                            self.SR['hHT_4j2b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
-                            if Nbjet == 2: 
-                                self.SR['hHT_4j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
-                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
-                                    self.SR['hHT_4j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['hHT_4j2b_bin'+str(j)].PassSR()
-                    if Njet >= 7 : ### 7 jets area
-                        for i in range(1,3):
-                            for j in range(1,5): 
-                                self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
-                                if Nbjet == i: 
-                                    self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 4)):
-                                        self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
-                        for j in range(1,6): 
-                            self.SR['hHT_7j0b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
-                            if Nbjet == 0: 
-                                self.SR['hHT_7j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
-                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
-                                    self.SR['hHT_7j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['hHT_7j0b_bin'+str(j)].PassSR()
-                    if Njet >= 2 and Njet < 7 : ### 2 jets area II
-                        for j in range(1,4): self.SR['hHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
+                                    self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['mHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
+                    ## need separate loop for 7j,0b
+                    self.SR['mHT_7j0b_bin'+str(j)].Pass('more than 7 jets')
+                    if Nbjet == 0:
+                        self.SR['mHT_7j0b_bin'+str(j)].Pass('0 bjets')
+                        for a in range(1,6): ## mT2 divisions
+                            if mT2 > mintervals[a][0] and mT2 < (mintervals[a][1] + 1e9*(a == 3)):
+                                self.SR['mHT_7j0b_bin'+str(a)].Pass("mT2 inside bin "+str(a))
+                                self.SR['mHT_7j0b_bin'+str(a)].PassSR()
+                if Njet >= 2 and Njet < 7 : ### 2 jets area II
+                    for j in range(1,5): ## mT2 divisions 
+                        self.SR['mHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
+                        if Nbjet >= 3: 
+                            self.SR['mHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
+                                self.SR['mHT_2j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['mHT_2j3b_bin'+str(j)].PassSR()   
+                if Njet >= 7 : ### 7 jets area II
+                    for j in range(1,5): ## mT2 divisions
+                        self.SR['mHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
+                        if Nbjet >= 3: 
+                            self.SR['mHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            if mT2 > mintervals[j][0] and mT2 < (mintervals[j][1] + 1e9*(j == 4)):
+                                self.SR['mHT_7j3b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['mHT_7j3b_bin'+str(j)].PassSR()   
+            ## High HT:
+            if HT > 1000 and HT < 1500:
+                hintervals = {1:[200,400],2:[400,600],3:[600,800],4:[800,1000],5:[1000,1200],6:[1200,1e9]} ## mT2
+                for key in hkeys: self.SR[key].Pass('High HT (HT > 1000 GeV and HT < 1500 GeV)')
+                if Njet >= 2 and Njet < 4 : ### 2 jets area
+                    for i in range(2):
+                        for j in range(1,7): 
+                            self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
+                            if Nbjet == i: 
+                                self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 6)):
+                                    self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['hHT_2j'+str(i)+'b_bin'+str(j)].PassSR()
+                    for j in range(1,6): 
+                        self.SR['hHT_2j2b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
+                        if Nbjet == 2: 
+                            self.SR['hHT_2j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
+                            if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
+                                self.SR['hHT_2j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['hHT_2j2b_bin'+str(j)].PassSR()
+                if Njet >= 4 and Njet < 7 : ### 4 jets area
+                    for i in range(2):
+                        for j in range(1,7): 
+                            self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
+                            if Nbjet == i: 
+                                self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 6)):
+                                    self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['hHT_4j'+str(i)+'b_bin'+str(j)].PassSR()
+                    for j in range(1,6): 
+                        self.SR['hHT_4j2b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
+                        if Nbjet == 2: 
+                            self.SR['hHT_4j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
+                            if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
+                                self.SR['hHT_4j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['hHT_4j2b_bin'+str(j)].PassSR()
+                if Njet >= 7 : ### 7 jets area
+                    for i in range(1,3):
+                        for j in range(1,5): 
+                            self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
+                            if Nbjet == i: 
+                                self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
+                                if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 4)):
+                                    self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['hHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
+                    for j in range(1,6): 
+                        self.SR['hHT_7j0b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
+                        if Nbjet == 0: 
+                            self.SR['hHT_7j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
+                            if mT2 > hintervals[j][0] and mT2 < (hintervals[j][1] + 1e9*(j == 5)):
+                                self.SR['hHT_7j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['hHT_7j0b_bin'+str(j)].PassSR()
+                if Njet >= 2 and Njet < 7 : ### 2 jets area II
+                    for j in range(1,4): 
+                        self.SR['hHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
                         if Nbjet >= 3: 
                             for a in range(1,4): ## mT2 divisions
                                 self.SR['hHT_2j3b_bin'+str(a)].Pass('more than 3 bjets')
                                 if mT2 > hintervals[a][0] and mT2 < (hintervals[a][1] + 1e9*(a == 3)):
                                     self.SR['hHT_2j3b_bin'+str(a)].Pass("mT2 inside bin"+str(a))
                                     self.SR['hHT_2j3b_bin'+str(a)].PassSR()   
-                    if Njet >= 7 : ### 7 jets area
-                        for j in range(1,4): self.SR['hHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
+                if Njet >= 7 : ### 7 jets area
+                    for j in range(1,4): 
+                        self.SR['hHT_7j3b_bin'+str(j)].Pass('more than 7 jets') ## mT2 bins
                         if Nbjet >= 3: 
                             for a in range(1,4): ## mT2 divisions
                                 self.SR['hHT_7j3b_bin'+str(j)].Pass('more than 3 bjets')
@@ -438,79 +420,78 @@ class cms_1705_04650:
                                     self.SR['hHT_7j3b_bin'+str(a)].Pass("mT2 inside bin"+str(a))
                                     self.SR['hHT_7j3b_bin'+str(a)].PassSR()   
 
-                ## Extreme HT:
-                if HT > 1500 and HT < 1e9:
-                    eintervals = {1:[400,600],2:[600,800],3:[800,1000],4:[1000,1400],5:[1400,1e9]} ## mT2
-                    for key in self.SR.keys(): 
-                        if 'eHT' in key: self.SR[key].Pass('Extreme HT (HT > 1500 GeV)')
-                    if Njet >= 2 and Njet < 4 : ### 2 jets area
+            ## Extreme HT: 
+            if HT > 1500 and HT < 1e9:
+                eintervals = {1:[400,600],2:[600,800],3:[800,1000],4:[1000,1400],5:[1400,1e9]} ## mT2
+                for key in ekeys: self.SR[key].Pass('Extreme HT (HT > 1500 GeV)')
+                if Njet >= 2 and Njet < 4 : ### 2 jets area
+                    for j in range(1,6): 
+                        self.SR['eHT_2j0b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
+                        if Nbjet == 0:
+                            self.SR['eHT_2j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
+                            if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 5)):
+                                self.SR['eHT_2j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['eHT_2j0b_bin'+str(j)].PassSR()
+                    for j in range(1,5):
+                        self.SR['eHT_2j1b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
+                        if Nbjet == 1:
+                            self.SR['eHT_2j1b_bin'+str(j)].Pass('1 bjet') ## bjets divisions
+                            if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 4)):
+                                self.SR['eHT_2j1b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['eHT_2j1b_bin'+str(j)].PassSR()
+                    self.SR['eHT_2j2b_bin1'].Pass('2-3 jets') ## Nb bins
+                    if Nbjet == 2:
+                        self.SR['eHT_2j2b_bin1'].Pass('2 bjets') ## Nb bins
+                        if mT2 > 400: 
+                            self.SR['eHT_2j2b_bin1'].Pass('mT2 inside bin 1')
+                            self.SR['eHT_2j2b_bin1'].PassSR()
+                if Njet >= 4 and Njet < 7 : ### 4 jets area
+                    for i in range(2):
                         for j in range(1,6): 
-                            self.SR['eHT_2j0b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
-                            if Nbjet == 0:
-                                self.SR['eHT_2j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
+                            self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
+                            if Nbjet == i: 
+                                self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
                                 if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 5)):
-                                    self.SR['eHT_2j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['eHT_2j0b_bin'+str(j)].PassSR()
-                        for j in range(1,5):
-                            self.SR['eHT_2j1b_bin'+str(j)].Pass('2-3 jets') ## Nb bins
-                            if Nbjet == 1:
-                                self.SR['eHT_2j1b_bin'+str(j)].Pass('1 bjet') ## bjets divisions
-                                if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 4)):
-                                    self.SR['eHT_2j1b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['eHT_2j1b_bin'+str(j)].PassSR()
-                        self.SR['eHT_2j2b_bin1'].Pass('2-3 jets') ## Nb bins
-                        if Nbjet == 2:
-                            self.SR['eHT_2j2b_bin1'].Pass('2 bjets') ## Nb bins
-                            if mT2 > 400: 
-                                self.SR['eHT_2j2b_bin1'].Pass('mT2 inside bin 1')
-                                self.SR['eHT_2j2b_bin1'].PassSR()
-                    if Njet >= 4 and Njet < 7 : ### 4 jets area
-                        for i in range(2):
-                            for j in range(1,6): 
-                                self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
-                                if Nbjet == i: 
-                                    self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 5)):
-                                        self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].PassSR()
+                                    self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['eHT_4j'+str(i)+'b_bin'+str(j)].PassSR()
+                    for j in range(1,4): 
+                        self.SR['eHT_4j2b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
+                        if Nbjet == 2: 
+                            self.SR['eHT_4j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
+                            if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
+                                self.SR['eHT_4j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['eHT_4j2b_bin'+str(j)].PassSR()
+                if Njet >= 7 : ### 7 jets area
+                    for i in range(1,3):
                         for j in range(1,4): 
-                            self.SR['eHT_4j2b_bin'+str(j)].Pass('4-6 jets') ## Nb bins
-                            if Nbjet == 2: 
-                                self.SR['eHT_4j2b_bin'+str(j)].Pass('2 bjets') ## bjets divisions
+                            self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
+                            if Nbjet == i: 
+                                self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
                                 if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
-                                    self.SR['eHT_4j2b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['eHT_4j2b_bin'+str(j)].PassSR()
-                    if Njet >= 7 : ### 7 jets area
-                        for i in range(1,3):
-                            for j in range(1,4): 
-                                self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
-                                if Nbjet == i: 
-                                    self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass(str(i)+' bjets') ## bjets divisions
-                                    if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
-                                        self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                        self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
-                        for j in range(1,5): 
-                            self.SR['eHT_7j0b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
-                            if Nbjet == 0: 
-                                self.SR['eHT_7j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
-                                if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 4)):
-                                    self.SR['eHT_7j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
-                                    self.SR['eHT_7j0b_bin'+str(j)].PassSR()
-                    if Njet >= 2 and Njet < 7 : ### 2 jets area II
-                        for j in range(1,3): ## mT2 divisions 
-                            self.SR['eHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
-                            if Nbjet >= 3: 
-                                self.SR['eHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
-                                if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
-                                    self.SR['eHT_2j3b_bin'+str(j)].Pass("mT2 inside bin"+str(j))
-                                    self.SR['eHT_2j3b_bin'+str(j)].PassSR()   
-                    if Njet >= 7 : ### 7 jets area
-                        self.SR['eHT_7j3b_bin1'].Pass('more than 7 jets') ## mT2 bins
+                                    self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                    self.SR['eHT_7j'+str(i)+'b_bin'+str(j)].PassSR()
+                    for j in range(1,5): 
+                        self.SR['eHT_7j0b_bin'+str(j)].Pass('more than 7 jets') ## Nb bins
+                        if Nbjet == 0: 
+                            self.SR['eHT_7j0b_bin'+str(j)].Pass('0 bjets') ## bjets divisions
+                            if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 4)):
+                                self.SR['eHT_7j0b_bin'+str(j)].Pass("mT2 inside bin "+str(j))
+                                self.SR['eHT_7j0b_bin'+str(j)].PassSR()
+                if Njet >= 2 and Njet < 7 : ### 2 jets area II
+                    for j in range(1,3): ## mT2 divisions 
+                        self.SR['eHT_2j3b_bin'+str(j)].Pass('2-6 jets') ## mT2 bins
                         if Nbjet >= 3: 
-                            self.SR['eHT_7j3b_bin1'].Pass('more than 3 bjets')
-                            if mT2 > 400:
-                                self.SR['eHT_7j3b_bin1'].Pass("mT2 inside bin 1")
-                                self.SR['eHT_7j3b_bin1'].PassSR()   
+                            self.SR['eHT_2j3b_bin'+str(j)].Pass('more than 3 bjets')
+                            if mT2 > eintervals[j][0] and mT2 < (eintervals[j][1] + 1e9*(j == 3)):
+                                self.SR['eHT_2j3b_bin'+str(j)].Pass("mT2 inside bin"+str(j))
+                                self.SR['eHT_2j3b_bin'+str(j)].PassSR()   
+                if Njet >= 7 : ### 7 jets area
+                    self.SR['eHT_7j3b_bin1'].Pass('more than 7 jets') ## mT2 bins
+                    if Nbjet >= 3: 
+                        self.SR['eHT_7j3b_bin1'].Pass('more than 3 bjets')
+                        if mT2 > 400:
+                            self.SR['eHT_7j3b_bin1'].Pass("mT2 inside bin 1")
+                            self.SR['eHT_7j3b_bin1'].PassSR()   
                                         
 
 
