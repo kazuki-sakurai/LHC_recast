@@ -33,7 +33,7 @@ except:
 if mode in ['QqN1']: mode = 'QQ4F'
 if mode in ['GqqN1', 'GttN1', 'GqqN2lLlN1', 'GqqC1wN1', 'GqqC1wN2zN1']: mode = 'GG'
 if mode in ['C1lLlN1_C1lLlN1', 'C1lL3lN1_C1lL3lN1']: mode = 'C1C1wino'
-if mode in ['C1lLlN1_N2lLlN1', 'C1lL3lN1_N2lL3lN1']: mode = 'C1N2wino'
+if mode in ['C1lLlN1_N2lLlN1', 'C1lL3lN1_N2lL3lN1', 'C1whadN1_N2zlepN1', 'C1wlepN1_N2zlepN1']: mode = 'C1N2wino'
 if mode in ['B1tC1wN1']: mode = 'Q3Q3'
 
 GG_file = 'GGxsec{rs}.dat'.format(rs=rs)

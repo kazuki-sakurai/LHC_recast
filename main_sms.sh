@@ -9,7 +9,7 @@ if [[ $3 == '' ]]; then
 fi
 
 mode=$1 # [QqN1, GqqN1, GttN1, GqqN2lLlN1]
-if [ $mode == 'QqN1' ] || [ $mode == 'GqqN1' ] || [ $mode == 'GttN1' ]; then
+if [ $mode == 'QqN1' ] || [ $mode == 'GqqN1' ] || [ $mode == 'GttN1' ] || [ $mode == 'LlN1' ] || [ $mode == 'C1whadN1_N2zlepN1' ] || [ $mode == 'C1wlepN1_N2zlepN1' ]; then
     n_mass=2
     m1=$2
     m2=$3
@@ -31,6 +31,22 @@ if [ $mode == 'C1lLlN1_N2lLlN1' ] || [ $mode == 'C1lLlN1_C1lLlN1' ] || [ $mode =
     tag=$mode'_'$m1'_'$m2'_'$m3    
 fi
 
+xs_flag='read_from_table'
+if [ $mode == 'LlN1' ]; then
+    xs_flag='read_from_pythia'
+    nev='100000'
+    if [ $m1 -gt 100 ]; then 
+        nev='50000' 
+    fi
+    if [ $m1 -gt 200 ]; then 
+        nev='10000' 
+    fi
+    if [ $m1 -gt 300 ]; then 
+        nev='5000' 
+    fi
+fi
+
+
 energy='13'
 lumi='3.2'
 nev_min='5000'
@@ -47,13 +63,20 @@ if [[ $n_mass == 4 ]]; then
 fi
 
 #---- cross-section
-XSfb=`$wdir'/cross-section/read_XSfb_from_data.py' $mode  $m1 $energy`
-echo 'Cross-Section: '$XSfb' [fb]'
-nev=`$wdir/cross-section/get_nev.py $XSfb $lumi $nev_min`
-echo 'Nev: '$nev
+if [ $xs_flag == 'read_from_table' ]; then
+    XSfb=`$wdir'/cross-section/read_XSfb_from_data.py' $mode  $m1 $energy`
+    echo 'Cross-Section: '$XSfb' [fb]'
+    nev=`$wdir/cross-section/get_nev.py $XSfb $lumi $nev_min`
+    echo 'Nev: '$nev
+fi
 
 #---- event generation 
 sh run_pythia.sh $tag.spcdec $mode $energy $nev # > generates $tag.hepmc, $tag.pythia_out
+
+if [ $xs_flag == 'read_from_pythia' ]; then
+    XSfb=`$wdir/cross-section/read_XSfb_from_pythia_out.py $wdir/result/$tag.pythia_out`
+    echo 'Cross-Section: '$XSfb' [fb]'        
+fi
 
 #---- detector simulation 
 sh run_delphes.sh $tag.hepmc  # > generates $tag.lhco
