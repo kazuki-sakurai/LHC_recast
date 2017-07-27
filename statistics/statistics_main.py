@@ -51,7 +51,7 @@ for ana in ana_list:
     SRdata = data['SR']
     SR_list = SRdata.keys()
     print SR_list
-    eff, mc_err = get_eff(ana, SR_list, eff_file)
+    eff, mc_err_p, mc_err_m = get_eff(ana, SR_list, eff_file)
     print eff.keys()
     print '################################'
     print 'Analysis:', ana
@@ -73,8 +73,8 @@ for ana in ana_list:
     sr = choices[0][1]
     print 'Chosen analysis:',sr
     sig_cent = eff[sr] * xsfb * lumi
-    sig_pos = (eff[sr] + mc_err[sr]) * xsfb * (1. + xs_err) * lumi
-    sig_neg = (eff[sr] - mc_err[sr]) * xsfb * (1. - xs_err) * lumi
+    sig_pos = (eff[sr] + mc_err_p[sr]) * xsfb * (1. + xs_err)* lumi
+    sig_neg = (eff[sr] - mc_err_m[sr]) * xsfb * (1. - xs_err) * lumi
     chi2isa = chi2(sig_cent, 1.*SRdata[sr]['Nbkg'], 1.*SRdata[sr]['Nbkg_err'] ,  1.*SRdata[sr]['Nobs'])    
     chi2isa_pos = chi2(sig_pos, 1.*SRdata[sr]['Nbkg'], 1.*SRdata[sr]['Nbkg_err'] ,  1.*SRdata[sr]['Nobs'])    
     chi2isa_neg = chi2(sig_neg, 1.*SRdata[sr]['Nbkg'], 1.*SRdata[sr]['Nbkg_err'] ,  1.*SRdata[sr]['Nobs'])    
