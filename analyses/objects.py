@@ -36,7 +36,11 @@ class Cut:
         OrderedDict(sorted(self.id.items(), key=lambda t: t[1]))
         for name, idd in self.id.iteritems():
             Eff = float(self.cut[name]) / float(Nev)
-
+            if Eff > 0:
+                err = sqrt(float(self.cut[name])) / float(Nev)
+            else:
+                err = 1. / float(Nev)
+            Eff = str(Eff) + ' +- ' + str(err)
             table.add_row( [idd, name, Eff] )
 
         #print '='*10 +' '+ self.SRname +' '+ '='*10 

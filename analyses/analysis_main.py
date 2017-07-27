@@ -4,7 +4,7 @@ import sys, os, gzip
 import ROOT
 from LHCO_reader import LHCO_reader
 from objects import *
-#from atlas_1605_03814 import * 
+from atlas_1605_03814 import * 
 #from atlas_1602_09058 import *
 #from atlas_1605_04285 import *
 from atlas_conf_2016_093 import *
@@ -17,7 +17,7 @@ a = Structure()
 inFiles = sys.argv
 inFiles.pop(0)
 
-#atlas_1605_03814 = atlas_1605_03814()
+atlas_1605_03814 = atlas_1605_03814()
 #atlas_1602_09058 = atlas_1602_09058()
 #atlas_1605_04285 = atlas_1605_04285()
 atlas_conf_2016_093 = atlas_conf_2016_093()

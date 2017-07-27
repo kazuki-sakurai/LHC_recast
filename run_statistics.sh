@@ -10,12 +10,13 @@ eff_path=$wdir/result/$tag.eff
 stats_out=$wdir/result/$tag.stats
 
 XS_in_fb=$2
+XS_err=$3
 
 if [[ -e $stats_out ]]; then
     rm -f $stats_out
 fi
 
-$statistics_main  $XS_in_fb  $eff_path  | tee $stats_out 
+$statistics_main  $eff_path  $XS_in_fb  $XS_err | tee $stats_out 
 ls  -ltr  $stats_out
 
 echo "#--- End of run_statistics.sh ---#"

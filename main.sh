@@ -33,7 +33,8 @@ XSfb=`$xsecs_main $pythia_out_path`
 echo 'Cross-Section: '$XSfb' [fb]'
 
 #---- statistics 
-sh run_statistics.sh $tag.eff $XSfb # > generates $tag.stats
+XS_err='0.1'
+sh run_statistics.sh $tag.eff $XSfb $XS_err # > generates $tag.stats
 
 
 exit

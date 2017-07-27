@@ -48,8 +48,8 @@ fi
 
 
 energy='13'
-lumi='3.2'
-nev_min='5000'
+lumi='36'
+nev_min='2000'
 
 #---- calculate decay table 
 if [[ $n_mass == 2 ]]; then
@@ -85,7 +85,8 @@ sh run_delphes.sh $tag.hepmc  # > generates $tag.lhco
 sh run_analysis.sh $tag.lhco  # > generates $tag.eff
 
 #---- statistics 
-sh run_statistics.sh $tag.eff $XSfb # > generates $tag.stats
+XS_err='0.1'
+sh run_statistics.sh $tag.eff $XSfb $XS_err # > generates $tag.stats
 
 
 exit
