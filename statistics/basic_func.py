@@ -2,7 +2,7 @@
 import sys, os
 
 def get_eff(ana_target, SR_list, eff_file):
-    eff, mc_err = {}, {}
+    eff, mc_err_p, mc_err_m = {}, {}, {}
     ana, mode, sr_current = '', '', ''
     for line in open(eff_file):
         elems = line.split() 
@@ -15,5 +15,6 @@ def get_eff(ana_target, SR_list, eff_file):
                     print elems[3]
                     sr_current = elems[3]
                     eff[sr_current] = float(elems[5])               
-                    mc_err[sr_current] = float(elems[7])                                   
-    return eff, mc_err
+                    mc_err_p[sr_current] = float(elems[7])
+                    mc_err_m[sr_current] = float(elems[9])                                   
+    return eff, mc_err_p, mc_err_m
