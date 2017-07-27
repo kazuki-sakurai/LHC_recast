@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from ROOT import gROOT, TH1F, gRandom, TNamed, TLorentzVector, gStyle, TCanvas, TFile
+from ROOT import gROOT, TH1F, gRandom, TNamed, TLorentzVector, gStyle, TCanvas, TFile, TEfficiency
 from LHCO_reader import LHCO_reader
 from collections import OrderedDict
 from prettytable import PrettyTable
@@ -32,15 +32,17 @@ class Cut:
 
         table = PrettyTable([self.SRname, 'cut-name', 'Eff'])
         table.padding_width = 2        
-
+        nden = int(Nev)
         OrderedDict(sorted(self.id.items(), key=lambda t: t[1]))
         for name, idd in self.id.iteritems():
-            Eff = float(self.cut[name]) / float(Nev)
-            if Eff > 0:
-                err = sqrt(float(self.cut[name])) / float(Nev)
-            else:
-                err = 1. / float(Nev)
-            Eff = str(Eff) + ' +- ' + str(err)
+            nsel = int(self.cut[name])
+            
+            Eff = float(nsel) / float(Nev)
+            err_plus = TEfficiency.FeldmanCousins(nden, nsel, .6827, True)
+            err_minus = TEfficiency.FeldmanCousins(nden, nsel, .6827, False)
+
+            
+            Eff = str(Eff) + ' + ' + str(err_plus) +" - " +str(err_minus)
             table.add_row( [idd, name, Eff] )
 
         #print '='*10 +' '+ self.SRname +' '+ '='*10 
