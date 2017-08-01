@@ -38,11 +38,13 @@ class Cut:
             nsel = int(self.cut[name])
             
             Eff = float(nsel) / float(Nev)
-            err_plus = TEfficiency.FeldmanCousins(nden, nsel, .6827, True)
-            err_minus = TEfficiency.FeldmanCousins(nden, nsel, .6827, False)
+            err_plus = TEfficiency.Bayesian(nden, nsel, .6827, 0.5,0.5 True)
+            err_minus = TEfficiency.Bayesian(nden, nsel, .6827, 0.5,0.5, False)
+            print "-_-", nden, nsel
+            print "0_0", Eff, err_plus, err_minus
 
             
-            Eff = str(Eff) + ' + ' + str(err_plus) +" - " +str(err_minus)
+            Eff = str(Eff) + ' + ' + str(abs(err_plus-Eff)) +" - " +str(abs(err_minus-Eff))
             table.add_row( [idd, name, Eff] )
 
         #print '='*10 +' '+ self.SRname +' '+ '='*10 
