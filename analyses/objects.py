@@ -40,9 +40,7 @@ class Cut:
             Eff = float(nsel) / float(Nev)
             err_plus = TEfficiency.Bayesian(nden, nsel, .6827, 0.5,0.5, True)
             err_minus = TEfficiency.Bayesian(nden, nsel, .6827, 0.5,0.5, False)
-            print "-_-", nden, nsel
-            print "0_0", Eff, err_plus, err_minus
-
+            
             
             Eff = str(Eff) + ' + ' + str(abs(err_plus-Eff)) +" - " +str(abs(err_minus-Eff))
             table.add_row( [idd, name, Eff] )
