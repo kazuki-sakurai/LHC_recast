@@ -13,8 +13,9 @@ def get_eff(ana_target, SR_list, eff_file):
                 #print elems[3]
                 if elems[3] in SR_list:
                     print elems[3]
+                    print "-_-", elems
                     sr_current = elems[3]
                     eff[sr_current] = float(elems[5])               
-                    mc_err_p[sr_current] = float(elems[7])
-                    mc_err_m[sr_current] = float(elems[9])                                   
+                    mc_err_p[sr_current] = abs(float(elems[7]))# - eff[sr_current])
+                    mc_err_m[sr_current] = abs(float(elems[9]))# - eff[sr_current])                                  
     return eff, mc_err_p, mc_err_m
