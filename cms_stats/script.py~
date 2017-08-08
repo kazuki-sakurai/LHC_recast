@@ -1,0 +1,45 @@
+from ModelBricks import *
+from iminuit import *
+from ROOT import *
+f = TFile("CMS-PAS-SUS-16-036_merged.root")
+
+
+def read_file(stuff = "CMS-PAS-SUS-16-036_merged", signal = "shapes_prefit/signal", bkg = "shapes_prefit/pred", dat = "shapes_prefit/obs", cov= "shapes_prefit/covarMatrix"):
+    f = TFile(stuff + ".root")
+    hsig = f.Get(signal)
+    hbkg = f.Get(bkg)
+    hdat = f.Get(dat)
+    COV = f.Get(cov)
+    N = hsig.GetNbinsX()
+    params = []
+    params.append(Free("mu", 1, stepsize = .1))
+    ary_s, ary_b, ary_d = np.float64(N*[0.]), np.float64(N*[0.]), np.int32(N*[0])
+    cov_m = np.matrix(N*[N*[0.]], dtype = np.float64)
+    for i in range(N):
+        ary_s [i] = hsig.GetBinContent(i+1)
+        ary_b[i] = hbkg.GetBinContent(i+1)
+        ary_d[i] = hdat.GetBinContent(i+1)
+        params.append(Free("b_"+str(i), ary_b[i], stepsize = .1))
+        params.append(Parameter("s_" + str(i),ary_s[i]))
+        for j in range(N):
+            cov_m[i,j] = COV.GetBinContent(i+1,j+1)
+        
+    return params, ary_s, ary_b, ary_d, np.linalg.inv(cov_m)
+    
+params, ary_s, ary_b, ary_d,cinv = read_file()
+
+manager = BinFitBox(params, ary_s, ary_b, ary_d,cinv)
+manager.createFit()
+manager.fit.migrad()
+#manager.fit.hesse()
+#manager.fit.minos()
+
+chi2sb = manager.fit.get_fmin()['fval']
+manager.Params["mu"].setVal(0)
+manager.Params["mu"].constant = True
+manager.createFit()
+manager.fit.migrad()
+chi2b = manager.fit.get_fmin()['fval']
+
+                   
+print chi2sb - chi2b

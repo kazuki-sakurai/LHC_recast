@@ -1,0 +1,28 @@
+from ModelBricks import *
+from iminuit import *
+from ROOT import *
+#f = TFile("/scratch18/kazuki2/statistics/CMS-PAS-SUS-16-036_merged.root")
+
+print "ESTASME IMPORTANDO A MIN"
+def read_file(sig, stuff = "/scratch18/kazuki2/statistics/CMS-PAS-SUS-16-036_merged", signal = "shapes_prefit/signal", bkg = "shapes_prefit/pred", dat = "shapes_prefit/obs", cov= "shapes_prefit/covarMatrix"):
+    f = TFile(stuff + ".root")
+    #hsig = f.Get(signal)
+    hbkg = f.Get(bkg)
+    hdat = f.Get(dat)
+    COV = f.Get(cov)
+    N = hdat.GetNbinsX()
+    params = []
+    ary_s = np.float64(sig)
+    params.append(Free("mu", 1, stepsize = .1))
+    ary_b, ary_d = np.float64(N*[0.]), np.int32(N*[0])
+    cov_m = np.matrix(N*[N*[0.]], dtype = np.float64)
+    for i in range(N):
+        #ary_s [i] = hsig.GetBinContent(i+1)
+        ary_b[i] = hbkg.GetBinContent(i+1)
+        ary_d[i] = hdat.GetBinContent(i+1)
+        params.append(Free("b_"+str(i), ary_b[i], stepsize = .1, limits = (0,max(100, 2*ary_b[i]))))
+        params.append(Parameter("s_" + str(i),ary_s[i]))
+        for j in range(N):
+            cov_m[i,j] = COV.GetBinContent(i+1,j+1)
+        
+    return params, ary_s, ary_b, ary_d, np.linalg.inv(cov_m)
