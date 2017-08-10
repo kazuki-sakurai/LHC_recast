@@ -9,11 +9,11 @@ import matplotlib.colors as cls
 from scipy.interpolate import interp1d
 
 ananame = 'atlas_1706_03731'
-sms_topo = r'$\tilde g  \to qq(ll/ \nu \nu) \tilde \chi^0_1 $'
+sms_topo = r'$\tilde g  \to qqWZ \tilde \chi^0_1 $'
 #sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
 
-plot_name = '1706_03731_d.pdf'
-infile = '1706_03731_d.txt'
+plot_name = '1706_03731_c.pdf'
+infile = '1706_03731_c.txt'
 
 # load data
 data = np.loadtxt(infile)

@@ -9,15 +9,15 @@ import matplotlib.colors as cls
 from scipy.interpolate import interp1d
 
 ananame = 'atlas_1706_03731'
-sms_topo = r'$\tilde g  \to qq(ll/ \nu \nu) \tilde \chi^0_1 $'
+sms_topo = r'$\tilde g - \tilde g \to tt \tilde \chi^0_1 $'
 #sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
 
-plot_name = '1706_03731_d.pdf'
-infile = '1706_03731_d.txt'
+plot_name = '1706_03731_a.pdf'
+infile = '1706_03731_a.txt'
 
 # load data
 data = np.loadtxt(infile)
-#yar, xar, zar = data.transpose()
+#yar, xar, zar, zp, zn = data.transpose()
 xar, yar, zar, zp, zn = data.transpose()
 
 # kinematical constraint
