@@ -9,11 +9,11 @@ import matplotlib.colors as cls
 from scipy.interpolate import interp1d
 
 ananame = 'cms_1705_04650'
-sms_topo = r'$\tilde g  \to tt \tilde \chi^0_1 $'
+sms_topo = r'$\tilde q  \to q \tilde \chi^0_1 $'
 #sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
 
-plot_name = 'cms_1705_04650_b.pdf'
-infile = 'cms_1705_04650_b.txt'
+plot_name = 'cms_1705_04650_f.pdf'
+infile = 'cms_1705_04650_f.txt'
 
 # load data
 data = np.loadtxt(infile)
@@ -42,7 +42,7 @@ fig.subplots_adjust(bottom=0.13, right=0.97, top=0.95, left=0.15)
 # axes labels
 #ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
 #ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
-ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
+ax.set_xlabel(r'$m_{\tilde q} [\rm GeV]$', fontsize=23)
 ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
 # axes ranges
 ax.set_xlim([min(xar)*0.5, max(xar)*1.05])
@@ -53,9 +53,13 @@ plt.xticks(fontsize = 14)
 plt.yticks(fontsize = 14) 
 
  
-obs0 = np.loadtxt('cmsObs0_b.dat', delimiter=',').transpose()
-obsup = np.loadtxt('cmsObs+1_b.dat', delimiter=',').transpose()
-obsdw = np.loadtxt('cmsObs-1_b.dat', delimiter=',').transpose()
+obs0 = np.loadtxt('cmsObs0_f.dat', delimiter=',').transpose()
+obsup = np.loadtxt('cmsObs+1_f.dat', delimiter=',').transpose()
+obsdw = np.loadtxt('cmsObs-1_f.dat', delimiter=',').transpose()
+
+obslow0 = np.loadtxt('cmsObs0low_f.dat', delimiter=',').transpose()
+obslowup = np.loadtxt('cmsObs+1low_f.dat', delimiter=',').transpose()
+obslowdw = np.loadtxt('cmsObs-1low_f.dat', delimiter=',').transpose()
 
 lw_exp_0 = 2.5
 lw_exp_er = 2.
@@ -66,6 +70,9 @@ ax.plot(obs0[0], obs0[1], lw=lw_exp_0, ls='-', c=c_exp, alpha=op)
 ax.plot(obsup[0], obsup[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 ax.plot(obsdw[0], obsdw[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 
+ax.plot(obslow0[0], obslow0[1], lw=lw_exp_0, ls='-', c=c_exp, alpha=op)
+ax.plot(obslowup[0], obslowup[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
+ax.plot(obslowdw[0], obslowdw[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 
 
 # scatter plot

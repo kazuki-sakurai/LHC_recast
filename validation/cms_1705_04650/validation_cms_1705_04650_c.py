@@ -9,11 +9,11 @@ import matplotlib.colors as cls
 from scipy.interpolate import interp1d
 
 ananame = 'cms_1705_04650'
-sms_topo = r'$\tilde g  \to tt \tilde \chi^0_1 $'
+sms_topo = r'$\tilde g  \to qq \tilde \chi^0_1 $'
 #sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
 
-plot_name = 'cms_1705_04650_b.pdf'
-infile = 'cms_1705_04650_b.txt'
+plot_name = 'cms_1705_04650_c.pdf'
+infile = 'cms_1705_04650_c.txt'
 
 # load data
 data = np.loadtxt(infile)
@@ -53,9 +53,9 @@ plt.xticks(fontsize = 14)
 plt.yticks(fontsize = 14) 
 
  
-obs0 = np.loadtxt('cmsObs0_b.dat', delimiter=',').transpose()
-obsup = np.loadtxt('cmsObs+1_b.dat', delimiter=',').transpose()
-obsdw = np.loadtxt('cmsObs-1_b.dat', delimiter=',').transpose()
+obs0 = np.loadtxt('cmsObs0_c.dat', delimiter=',').transpose()
+obsup = np.loadtxt('cmsObs+1_c.dat', delimiter=',').transpose()
+obsdw = np.loadtxt('cmsObs-1_c.dat', delimiter=',').transpose()
 
 lw_exp_0 = 2.5
 lw_exp_er = 2.
