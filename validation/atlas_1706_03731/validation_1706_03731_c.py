@@ -21,7 +21,9 @@ data = np.loadtxt(infile)
 xar, yar, zar, zp, zn = data.transpose()
 
 # kinematical constraint
-cond = np.where( xar > yar + 80. + 91. )
+mw, mz = 80.4, 91.
+mingap = mw + mz
+cond = np.where( xar > yar + mingap )
 xar = xar[cond]        
 yar = yar[cond]        
 zar = zar[cond]
@@ -45,7 +47,7 @@ fig.subplots_adjust(bottom=0.13, right=0.97, top=0.95, left=0.15)
 ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
 ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
 # axes ranges
-ax.set_xlim([min(xar)*0.5, max(xar)*1.05])
+ax.set_xlim([min(xar)*0.9, max(xar)*1.05])
 ax.set_ylim([min(yar)*0.9, max(yar)*1.05])
 
 # ticks font
@@ -69,7 +71,8 @@ ax.plot(obsdw[0], obsdw[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 
 
 # scatter plot
-sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), lw=1, marker='o', alpha=0.7, rasterized=False)    
+vmin, vmax = 10**-3, 1
+sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), vmin = vmin, vmax = vmax, lw=1, marker='o', alpha=0.7, rasterized=False)    
 # color bar
 cb = plt.colorbar(sc)        
 
