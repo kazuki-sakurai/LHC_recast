@@ -26,9 +26,9 @@ try:
     mode = sys.argv[1]    
     m_in = float(sys.argv[2])
     rs   = int(sys.argv[3])
+    br   = float(sys.argv[4])    
 except:
-    print '[mode] [mass] [energy]'
-    print 'mode = [GG, QQ4F, QQ5F, Q3Q3, C1C1wino, C1N2wino]'
+    print '[mode] [mass] [energy] [BR]'
 
 if mode in ['QqN1']: mode = 'QQ4F'
 if mode in ['GqqN1', 'GttN1', 'GbbN1', 'GqqN2lLlN1', 'GqqC1wN1', 'GqqC1wN2zN1']: mode = 'GG'
@@ -43,28 +43,28 @@ C1C1_file = 'C1C1wino{rs}.dat'.format(rs=rs)
 C1N2_file = 'C1N2wino{rs}.dat'.format(rs=rs)
 
 if mode == 'GG': 
-    print get_xsfb(GG_file, m_in, 'pb')
+    print get_xsfb(GG_file, m_in, 'pb') * br
     exit()
 
 if mode == 'QQ5F': 
-    print get_xsfb(QQ5F_file, m_in, 'pb')
+    print get_xsfb(QQ5F_file, m_in, 'pb') * br
     exit()
 
 if mode == 'Q3Q3': 
-    print get_xsfb(Q3Q3_file, m_in, 'pb')
+    print get_xsfb(Q3Q3_file, m_in, 'pb') * br
     exit()
 
 if mode == 'QQ4F': 
     QQ5F = get_xsfb(QQ5F_file, m_in, 'pb')
     BLBL = BRBR = get_xsfb(Q3Q3_file, m_in, 'pb')
     QQ4F = QQ5F - BLBL - BRBR
-    print QQ4F
+    print QQ4F * br
     exit()
 
 if mode == 'C1C1wino': 
-    print get_xsfb(C1C1_file, m_in, 'fb')
+    print get_xsfb(C1C1_file, m_in, 'fb') * br
     exit()
 
 if mode == 'C1N2wino': 
-    print get_xsfb(C1N2_file, m_in, 'fb')
+    print get_xsfb(C1N2_file, m_in, 'fb') * br
     exit()
