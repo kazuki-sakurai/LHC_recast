@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as cls
 from scipy.interpolate import interp1d
 
-ananame = 'cms_1705_04650'
-sms_topo = r'$\tilde g  \to bb \tilde \chi^0_1 $'
+ananame = 'atlas_1602_09058'
+sms_topo = r'$\tilde b  \to t \tilde \chi^0_1 $'
 #sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
 
-plot_name = 'cms_1705_04650_a.pdf'
-infile = 'cms_1705_04650_a.txt'
+plot_name = '1602_09058_c.pdf'
+infile = '1602_09058_c.txt'
 
 # load data
 data = np.loadtxt(infile)
@@ -21,7 +21,8 @@ data = np.loadtxt(infile)
 xar, yar, zar, zp, zn = data.transpose()
 
 # kinematical constraint
-cond = np.where( xar > yar )
+mingap = 100. + 172.
+cond = np.where( xar > yar + mingap )
 xar = xar[cond]        
 yar = yar[cond]        
 zar = zar[cond]
@@ -42,10 +43,10 @@ fig.subplots_adjust(bottom=0.13, right=0.97, top=0.95, left=0.15)
 # axes labels
 #ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
 #ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
-ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
+ax.set_xlabel(r'$m_{\tilde b} [\rm GeV]$', fontsize=23)
 ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
 # axes ranges
-ax.set_xlim([min(xar)*0.5, max(xar)*1.05])
+ax.set_xlim([min(xar)*0.95, max(xar)*1.05])
 ax.set_ylim([min(yar)*0.9, max(yar)*1.05])
 
 # ticks font
@@ -53,9 +54,9 @@ plt.xticks(fontsize = 14)
 plt.yticks(fontsize = 14) 
 
  
-obs0 = np.loadtxt('cmsObs0_a.dat', delimiter=',').transpose()
-obsup = np.loadtxt('cmsObs+1_a.dat', delimiter=',').transpose()
-obsdw = np.loadtxt('cmsObs-1_a.dat', delimiter=',').transpose()
+obs0 = np.loadtxt('1602_09058_c_Obs.dat', delimiter=',').transpose()
+obsup = np.loadtxt('1602_09058_c_ObsSup.dat', delimiter=',').transpose()
+obsdw = np.loadtxt('1602_09058_c_ObsInf.dat', delimiter=',').transpose()
 
 lw_exp_0 = 2.5
 lw_exp_er = 2.
@@ -69,8 +70,8 @@ ax.plot(obsdw[0], obsdw[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 
 
 # scatter plot
-vmin, vmax = 10**-3, 1
-sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), vmin = vmin, vmax = vmax, lw=1, marker='o', alpha=0.7, rasterized=False)    
+vmin, vmax = 10**-3, 1 
+sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), vmin=vmin, vmax=vmax, lw=1, marker='o', alpha=0.7, rasterized=False)    
 # color bar
 cb = plt.colorbar(sc)        
 
@@ -90,7 +91,7 @@ ax.tricontour(xar,yar,zn,  levels, linewidths=lw_er, colors='r', linestyles='--'
 # diagonal lines
 #ax.plot([0,3000],[0,3000],lw=1,c='gray')
 #ax.fill_between([0,3000], [0,3000], [3000,3000], lw=1, hatch='xxx', facecolor='', edgecolor="k")
-ax.fill_between([0,3000], [0,3000], [3000,3000], lw=1, alpha=0.3, facecolor='gray')
+ax.fill_between([0 + mingap, 3000 + mingap], [0,3000], [3000,3000], lw=1, alpha=0.3, facecolor='gray')
 #ax.fill_between([0,3000], 200, 300)
 
 # legend

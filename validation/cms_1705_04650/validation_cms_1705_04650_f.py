@@ -76,7 +76,8 @@ ax.plot(obslowdw[0], obslowdw[1], lw=lw_exp_er, ls='--', c=c_exp, alpha=op)
 
 
 # scatter plot
-sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), lw=1, marker='o', alpha=0.7, rasterized=False)    
+vmin, vmax = 10**-3, 1
+sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), vmin = vmin, vmax = vmax, lw=1, marker='o', alpha=0.7, rasterized=False)    
 # color bar
 cb = plt.colorbar(sc)        
 
