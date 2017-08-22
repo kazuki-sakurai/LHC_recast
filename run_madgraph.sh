@@ -25,6 +25,7 @@ if [[ ! -d $master_mg5dir ]]; then
 fi
 
 if [[ -d $mg5_work ]]; then
+    echo 'removing existing directory '$mg5_work
     rm -rf $mg5_work
 fi
 cp -r $master_mg5dir $mg5_work

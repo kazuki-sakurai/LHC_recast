@@ -9,7 +9,7 @@ fi
 mode=$1 # [QqN1, GqqN1, GttN1, GqqN2lLlN1]
 
 event_generator='pythia'
-if [[ $mode == 'C1wlepN1_N2zlepN1' ]]; then
+if [[ $mode == 'C1wlepN1_N2zlepN1' ]] || [[ $mode == 'C1whadN1_N2zlepN1' ]]; then
     event_generator='madgraph'
 fi
 
@@ -78,8 +78,11 @@ fi
 if [ $xs_flag == 'read_from_table' ]; then
     br='1'
     if [[ $mode == 'C1wlepN1_N2zlepN1' ]]; then
-        br='0.01446'  #BR_zlep = 0.03363*2, BR_wleo = 0.215
+        br='0.01446'  #BR_zlep = 0.03363*2, BR_wlep = 0.215
     fi
+    if [[ $mode == 'C1whadN1_N2zlepN1' ]]; then
+        br='0.04547'  #BR_zlep = 0.03363*2, BR_whad = 0.676
+    fi    
     XSfb=`$wdir'/cross-section/read_XSfb_from_data.py' $mode  $m1 $energy $br`
     echo 'Cross-Section: '$XSfb' [fb]'
     nev=`$wdir/cross-section/get_nev.py $XSfb $lumi $nev_min`
