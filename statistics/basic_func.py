@@ -18,4 +18,9 @@ def get_eff(ana_target, SR_list, eff_file):
                     eff[sr_current] = float(elems[5])               
                     mc_err_p[sr_current] = abs(float(elems[7]))# - eff[sr_current])
                     mc_err_m[sr_current] = abs(float(elems[9]))# - eff[sr_current])                                  
+    k1 = eff.keys()
+    if len(k1) != len(SR_list):
+        print "CANCER"
+        for sr in SR_list:
+            if sr not in k1: print sr, "not in eff"
     return eff, mc_err_p, mc_err_m

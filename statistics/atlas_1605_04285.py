@@ -81,4 +81,6 @@ res['SR'][SRname] = data
 
 f = open('{ananame}.pickle'.format(ananame=ananame), 'wb') 
 pickle.dump(res, f)
+f = open('{ananame}.pickle'.format(ananame=ananame), 'r') 
+c = pickle.load(f)
 

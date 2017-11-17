@@ -3,7 +3,7 @@ import sys, os, pickle
 from basic_func import *
 import numpy as np
 from sympy import oo
-from funcion_diego import * 
+from  funcion_diego import * 
 
 def LL(s,b0,s0,N):
     b = 0.5*(b0-s-s0**2) + 0.5*np.sqrt((b0-s-s0**2)**2 + 4*(N*s0**2 - s*s0**2 + 
