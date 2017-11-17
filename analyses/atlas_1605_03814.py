@@ -57,6 +57,7 @@ class atlas_1605_03814:
                 self.SR['base'].Pass('MET > 200')
                 if len(jets) > 0 and jets[0].pT > 200: 
                     self.SR['base'].Pass('pTj1 > 200')
+                    self.SR['base'].PassSR()
                     base_cut = True
 
         if base_cut == False: return

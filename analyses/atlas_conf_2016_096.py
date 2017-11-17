@@ -80,6 +80,7 @@ class atlas_conf_2016_096:
 
         if len(leps) > 1:
             self.SR['base'].Pass('lepton veto')
+            self.SR['base'].PassSR()
             base_cut = True
 
     

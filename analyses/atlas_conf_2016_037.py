@@ -21,9 +21,9 @@ class atlas_conf_2016_037:
         self.SR['0b2'] = Cut('0b2')
         self.SR['1b'] = Cut('1b')
         self.SR['3b'] = Cut('3b')
-        self.SR['1b-DD'] = Cut('1b-DD')
-        self.SR['3b-DD'] = Cut('3b-DD')
-        self.SR['1b-GG'] = Cut('1b-GG')
+        ## self.SR['1b-DD'] = Cut('1b-DD')
+        ## self.SR['3b-DD'] = Cut('3b-DD')
+        ## self.SR['1b-GG'] = Cut('1b-GG')
         
 
     #########################################
@@ -69,6 +69,7 @@ class atlas_conf_2016_037:
             self.SR['base'].Pass('Leptons')
             if len(jets) > 3: 
                 self.SR['base'].Pass('Njet >= 4')
+                self.SR['base'].PassSR()
                 base_cut = True
                          
         if base_cut == False: return
@@ -263,26 +264,26 @@ class atlas_conf_2016_037:
         #  SR: 1b-DD
         #########################
 
-        charge = []
-        for i in xrange(Nlep):
-            if np.sign(leps[i].pid) == -1:
-                charge = np.append(charge, -1)
+        ## charge = []
+        ## for i in xrange(Nlep):
+        ##     if np.sign(leps[i].pid) == -1:
+        ##         charge = np.append(charge, -1)
 
-        if len(charge) >= 2:
-            self.SR['1b-DD'].Pass('>= 2 negative leptons')
-            if Nbjet >= 1:
-               self.SR['1b-DD'].Pass('Nbjet >= 1')
-               if jets[0].pT > 50.:
-                   self.SR['1b-DD'].Pass('pTj1 > 50')
-                   if jets[1].pT > 50.:
-                       self.SR['1b-DD'].Pass('pTj2 > 50')
-                       if jets[2].pT > 50.:
-                           self.SR['1b-DD'].Pass('pTj3 > 50')
-                           if jets[3].pT > 50.:
-                               self.SR['1b-DD'].Pass('pTj4 > 50')
-                               if meff > 1200.:
-                                   self.SR['1b-DD'].Pass('meff > 1200')
-                                   self.SR['1b-DD'].PassSR()
+        ## if len(charge) >= 2:
+        ##     self.SR['1b-DD'].Pass('>= 2 negative leptons')
+        ##     if Nbjet >= 1:
+        ##        self.SR['1b-DD'].Pass('Nbjet >= 1')
+        ##        if jets[0].pT > 50.:
+        ##            self.SR['1b-DD'].Pass('pTj1 > 50')
+        ##            if jets[1].pT > 50.:
+        ##                self.SR['1b-DD'].Pass('pTj2 > 50')
+        ##                if jets[2].pT > 50.:
+        ##                    self.SR['1b-DD'].Pass('pTj3 > 50')
+        ##                    if jets[3].pT > 50.:
+        ##                        self.SR['1b-DD'].Pass('pTj4 > 50')
+        ##                        if meff > 1200.:
+        ##                            self.SR['1b-DD'].Pass('meff > 1200')
+        ##                            self.SR['1b-DD'].PassSR()
                 
                     
                 
@@ -291,57 +292,57 @@ class atlas_conf_2016_037:
 
 
 
-        #########################
-        #  SR: 3b-DD
-        #########################
+        ## #########################
+        ## #  SR: 3b-DD
+        ## #########################
 
-        charge1 = []
+        ## charge1 = []
 
-        for i in xrange(Nlep):
-            if np.sign(leps[i].pid) == -1:
-                charge1 = np.append(charge1, -1)
+        ## for i in xrange(Nlep):
+        ##     if np.sign(leps[i].pid) == -1:
+        ##         charge1 = np.append(charge1, -1)
 
-        if len(charge1) >= 2:
-            self.SR['3b-DD'].Pass('>= 2 negative leptons')
-            if Nbjet >= 3:
-                self.SR['3b-DD'].Pass('Nbjet >= 3')
-                if jets[0].pT > 50.:
-                    self.SR['3b-DD'].Pass('pTj1 > 50')
-                    if jets[1].pT > 50.:
-                        self.SR['3b-DD'].Pass('pTj2 > 50')
-                        if jets[2].pT > 50.:
-                            self.SR['3b-DD'].Pass('pTj3 > 50')
-                            if jets[3].pT > 50.:
-                                self.SR['3b-DD'].Pass('pTj4 > 50')
-                                if meff > 1000.:
-                                    self.SR['3b-DD'].Pass('meff > 1000')
-                                    self.SR['3b-DD'].PassSR()
+        ## if len(charge1) >= 2:
+        ##     self.SR['3b-DD'].Pass('>= 2 negative leptons')
+        ##     if Nbjet >= 3:
+        ##         self.SR['3b-DD'].Pass('Nbjet >= 3')
+        ##         if jets[0].pT > 50.:
+        ##             self.SR['3b-DD'].Pass('pTj1 > 50')
+        ##             if jets[1].pT > 50.:
+        ##                 self.SR['3b-DD'].Pass('pTj2 > 50')
+        ##                 if jets[2].pT > 50.:
+        ##                     self.SR['3b-DD'].Pass('pTj3 > 50')
+        ##                     if jets[3].pT > 50.:
+        ##                         self.SR['3b-DD'].Pass('pTj4 > 50')
+        ##                         if meff > 1000.:
+        ##                             self.SR['3b-DD'].Pass('meff > 1000')
+        ##                             self.SR['3b-DD'].PassSR()
 
 
 
-        #########################
-        #  SR: 1b-GG
-        #########################
+        ## #########################
+        ## #  SR: 1b-GG
+        ## #########################
 
-        if Nbjet >= 1:
-            self.SR['1b-GG'].Pass('Nbjet >= 1')
-            if Njet >= 6:
-                self.SR['1b-GG'].Pass('Njet >= 6')
-                if jets[0].pT > 50.:
-                    self.SR['1b-GG'].Pass('pTj1 > 50')
-                    if jets[1].pT > 50.:
-                        self.SR['1b-GG'].Pass('pTj2 > 50')
-                        if jets[2].pT > 50.:
-                            self.SR['1b-GG'].Pass('pTj3 > 50')
-                            if jets[3].pT > 50.:
-                                self.SR['1b-GG'].Pass('pTj4 > 50')
-                                if jets[4].pT > 50.:
-                                    self.SR['1b-GG'].Pass('pTj5 > 50')
-                                    if jets[5].pT > 50.:
-                                        self.SR['1b-GG'].Pass('pTj6 > 50')
-                                        if meff > 1800.:
-                                            self.SR['1b-GG'].Pass('meff > 1800')
-                                            self.SR['1b-GG'].PassSR()
+        ## if Nbjet >= 1:
+        ##     self.SR['1b-GG'].Pass('Nbjet >= 1')
+        ##     if Njet >= 6:
+        ##         self.SR['1b-GG'].Pass('Njet >= 6')
+        ##         if jets[0].pT > 50.:
+        ##             self.SR['1b-GG'].Pass('pTj1 > 50')
+        ##             if jets[1].pT > 50.:
+        ##                 self.SR['1b-GG'].Pass('pTj2 > 50')
+        ##                 if jets[2].pT > 50.:
+        ##                     self.SR['1b-GG'].Pass('pTj3 > 50')
+        ##                     if jets[3].pT > 50.:
+        ##                         self.SR['1b-GG'].Pass('pTj4 > 50')
+        ##                         if jets[4].pT > 50.:
+        ##                             self.SR['1b-GG'].Pass('pTj5 > 50')
+        ##                             if jets[5].pT > 50.:
+        ##                                 self.SR['1b-GG'].Pass('pTj6 > 50')
+        ##                                 if meff > 1800.:
+        ##                                     self.SR['1b-GG'].Pass('meff > 1800')
+        ##                                     self.SR['1b-GG'].PassSR()
             
            
                       

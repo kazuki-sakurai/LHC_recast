@@ -62,7 +62,7 @@ class cms_1705_04650:
         for i in range(1,3): self.SR['eHT_2j3b_bin'+str(i)] = Cut('eHT_2j3b_bin'+str(i))## 2 bins of MT2, extreme HT
         for i in range(1,2): ## 1 bin of MT2, extreme HT
             self.SR['eHT_2j2b_bin'+str(i)] = Cut('eHT_2j2b_bin'+str(i))
-            self.SR['eHT_7j3b_bin'+str(i)] = Cut('eHT_2j3b_bin'+str(i))
+            self.SR['eHT_7j3b_bin'+str(i)] = Cut('eHT_7j3b_bin'+str(i))
 
     #########################################
     #    Define jets, leptons, bjets, etc..

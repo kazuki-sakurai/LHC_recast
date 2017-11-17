@@ -55,6 +55,7 @@ class atlas_1602_09058:
             self.SR['base'].Pass('lepton number')
             if MET > 125.: 
                 self.SR['base'].Pass('MET > 125')
+                self.SR['base'].PassSR()
                 base_cut = True
 
         if base_cut == False: return

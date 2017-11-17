@@ -35,8 +35,8 @@ class atlas_conf_2016_093:
                 leps.append(lep)
             if abs(lep.pid) == 13 and lep.pT > 10 and lep.abseta < 2.4:       #muons
                 leps.append(lep)    
-            if abs(lep.pid) == 15 :#and lep.pT > 20 and lep.abseta < 2.47:     #tau
-                if 1:#lep.abseta < 1.37 or lep.abseta > 1.52:
+            if abs(lep.pid) == 15 and lep.pT > 20 and lep.abseta < 2.47:     #tau
+                if lep.abseta < 1.37 or lep.abseta > 1.52:
                     leps.append(lep)
                     taus.append(lep)
     
@@ -62,29 +62,34 @@ class atlas_conf_2016_093:
         base_cut = False
         if (len(taus) == 2 and np.sign(taus[1].pid) != np.sign(taus[0].pid)) or len(taus) >= 2:
             self.SR['base'].Pass('opposite sign tau pair')
-            if MET > 150.: 
-                self.SR['base'].Pass('MET > 150')
-                if len(bjets) == 0:
-                    self.SR['base'].Pass('b-jet veto')
-                    Ntau = len(taus)
-                    if Ntau > 1:
-                        ditaus = []
-                        for i in xrange(Ntau):
-                            for j in xrange(i+1, Ntau):
-                                m_inv = (taus[i].p + taus[j].p).M()
-                                if abs (m_inv - 79) < 10:  return
-                                if m_inv > 12. : ditaus.append( [taus[i], taus[j]])
-                                self.SR['base'].Pass("Z-veto")
-                        if len(ditaus):
-                            self.SR['base'].Pass("ditaus")
-                            mT2_c = []
-                            MET_m = 0.
-                            for i in xrange(len(ditaus)):
-                                mT2_c.append( MT2(ditaus[i][0].p.M(), ditaus[i][0].p.Px(), ditaus[i][0].p.Py(), ditaus[i][1].p.M(), ditaus[i][1].p.Px(), ditaus[i][1].p.Py(), MET_m, pTmiss.Px(), pTmiss.Py()))
-                            mT2 = np.max(mT2_c)
-                            if mT2 > 70.:
-                                self.SR['base'].Pass('mT2 > 70')
-                            base_cut = True
+            if taus[0].pT > 35.:
+                self.SR['base'].Pass('tau1pT > 35')
+                if taus[1].pT > 25.:
+                    self.SR['base'].Pass('tau2pT > 25')
+                    if MET > 150.: 
+                        self.SR['base'].Pass('MET > 150')
+                        if len(bjets) == 0:
+                            self.SR['base'].Pass('b-jet veto')
+                            Ntau = len(taus)
+                            if Ntau > 1:
+                                ditaus = []
+                                for i in xrange(Ntau):
+                                    for j in xrange(i+1, Ntau):
+                                        m_inv = (taus[i].p + taus[j].p).M()
+                                        if abs (m_inv - 79) < 10:  return
+                                        if m_inv > 12. : ditaus.append( [taus[i], taus[j]])
+                                        self.SR['base'].Pass("Z-veto")
+                                if len(ditaus):
+                                    self.SR['base'].Pass("ditaus")
+                                    mT2_c = []
+                                    MET_m = 0.
+                                    for i in xrange(len(ditaus)):
+                                        mT2_c.append( MT2(ditaus[i][0].p.M(), ditaus[i][0].p.Px(), ditaus[i][0].p.Py(), ditaus[i][1].p.M(), ditaus[i][1].p.Px(), ditaus[i][1].p.Py(), MET_m, pTmiss.Px(), pTmiss.Py()))
+                                    mT2 = np.max(mT2_c)
+                                    if mT2 > 70.:
+                                        self.SR['base'].Pass('mT2 > 70')
+                                        self.SR['base'].PassSR()
+                                        base_cut = True
         if base_cut == False: return
 
         #########################        
@@ -103,14 +108,14 @@ class atlas_conf_2016_093:
         #########################        
        
         if Ntau == Nlep:
-            self.SR['C1C1'].Pass('Light lepton veto')
+            self.SR['C1C1'].Pass('Light lepton veto')     #All leptons are taus
             self.SR['C1C1'].PassSR()
 
         #########################
         #  SR: C1N2
         #########################        
 
-        #self.SR['C1N2'].Pass('')
+        
         self.SR['C1N2'].PassSR()
        
          

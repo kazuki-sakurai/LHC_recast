@@ -5,15 +5,17 @@ import ROOT
 from LHCO_reader import LHCO_reader
 from objects import *
 #from atlas_1605_03814 import *
-from atlas_1602_09058 import *
+#from atlas_1602_09058 import *
 #from atlas_1605_04285 import *
 #from atlas_conf_2016_096 import *
+from atlas_conf_2017_039 import *
 import numpy as np
+import alyabar as aly
 
 a = Structure()
 
 #inFile = "/scratch16/diego/kazuki/result/GqqN1_1000_140.lhco"
-inFile = "../result/GqqN2lLlN1_750_615_547_480.lhco"
+inFile = "../result/C1wlepN1_N2zlepN1_550_50.lhco"
 
 #inFiles.pop(0)
 
@@ -113,9 +115,10 @@ def do(jets):
 ##     hs.Fill(s)
 ##     hA.Fill(A)
 for event in events:
-    base_objects = get_base_objects(event, add_taus = 1)
+    base_objects = get_base_objects(event, add_taus = 0)
     leps = base_objects['leps']
-    if len(leps) > 0 :
+    jets = base_objects['jets']
+    if len(leps) > 1:
            break
     ## for lep in leps:
     ##     if abs(lep.pid) > 13 :
