@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+import sys, os, math
+from math import *
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+import matplotlib.colors as cls
+from scipy.interpolate import interp1d
+
+ananame = 'atlas_1706_03731'
+sms_topo = r'$\tilde g - \tilde g \to tt \tilde \chi^0_1 $'
+#sms_topo = r'$\tilde \chi ^{\pm}_1 \to ??$'
+
+plot_name = '1706_03731_a.pdf'
+infile = '1706_03731_a.txt'
+
+# load data
+data = np.loadtxt(infile)
+#yar, xar, zar, zp, zn = data.transpose()
+xar, yar, zar, zp, zn = data.transpose()
+
+# kinematical constraint
+cond = np.where( xar > yar )
+xar = xar[cond]        
+yar = yar[cond]        
+zar = zar[cond]
+zp = zp[cond]
+zn = zn[cond]
+
+###################################################################################
+###################################################################################
+###################################################################################
+###################################################################################
+
+# declare plot
+fig = plt.figure()
+ax = fig.add_subplot(111) 
+
+# plot size
+fig.subplots_adjust(bottom=0.13, right=0.97, top=0.95, left=0.15)
+# axes labels
+#ax.set_xlabel(r'$m_{\tilde g} [\rm GeV]$', fontsize=23)
+#ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
+ax.set_xlabel(r'$m_{\tilde \chi_1^{\pm}} [\rm GeV]$', fontsize=23)
+ax.set_ylabel(r'$m_{\tilde \chi_1^0} [\rm GeV]$', fontsize=23)
+# axes ranges
+ax.set_xlim([min(xar)*0.5, max(xar)*1.05])
+ax.set_ylim([min(yar)*0.5, max(yar)*1.05])
+
+# ticks font
+plt.xticks(fontsize = 14) 
+plt.yticks(fontsize = 14) 
+
+
+# scatter plot
+sc = ax.scatter(xar, yar, s=30, c=zar, norm=cls.LogNorm(), lw=1, marker='o', alpha=0.7, rasterized=False)    
+# color bar
+cb = plt.colorbar(sc)        
+
+# chi2 = 0.05 contour
+levels = [0.05]
+ax.tricontour(xar,yar,zar,  levels, linewidths=2.5, colors='r', linestyles='-')
+ax.tricontour(xar,yar,zp,  levels, linewidths=1., colors='b', linestyles='-')
+ax.tricontour(xar,yar,zn,  levels, linewidths=1., colors='b', linestyles='-')
+
+# texting chi2 values 
+## for i in xrange(len(xar)):
+##     ax.text(xar[i], yar[i], '{zval}'.format(zval=zar[i]), fontsize=3, rotation=20)
+
+# diagonal lines
+#ax.plot([0,3000],[0,3000],lw=1,c='gray')
+#ax.fill_between([0,3000], [0,3000], [3000,3000], lw=1, hatch='xxx', facecolor='', edgecolor="k")
+ax.fill_between([0,3000], [0,3000], [3000,3000], lw=1, alpha=0.3, facecolor='gray')
+#ax.fill_between([0,3000], 200, 300)
+
+# legend
+x0 = min(xar) + 0.03*(max(xar) - min(xar))
+y0 = min(yar) + 0.95*(max(yar) - min(yar))
+ax.text(x0, y0, ananame, fontsize=13)
+y1 = y0 - 0.08*(max(yar) - min(yar))
+ax.text(x0, y1, sms_topo, fontsize=13)
+y2 = y1 - 0.08*(max(yar) - min(yar))
+x1 = x0 + 0.08*(max(xar) - min(xar))
+ax.plot([x0,x1],[y2,y2],lw=1.5,c='r')
+x2 = x1 + 0.03*(max(xar) - min(xar))
+ax.text(x2, y2*0.99, 'LHC_recast', fontsize=13)
+
+##########################################
+
+tag = infile.split('.')[0]
+fig.savefig(plot_name)
+print plot_name
+plt.show()
+
+#exit()
